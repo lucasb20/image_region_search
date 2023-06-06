@@ -40,19 +40,19 @@ int main(int argc,char **argv){
 
     imprimir(foto);
     
-    struct Image foto_filt=filtro(foto);
+    /* struct Image foto_filt=filtro(foto); */
 
     /* imprimir(foto_filt); */
 
-    /* int n = 3;
+/*     int n = 3;
 
-    struct Image *recortes = alg1(&foto,n,2,2);
+    struct Image *recortes = alg1(&foto,n,4,9);
 
     for(int i=0;i<n;i++){
         printf("Recorte número %d: \n",i);
         imprimir(*(recortes+i));
-    } */
-
+    }
+ */
     return 0;
 }
 
@@ -63,9 +63,8 @@ struct Image *alg1(struct Image *o,int n,int width,int height){
     int i=0,j=0;
     struct Image *recortes = calloc(n,sizeof(struct Image));
     while(k<n){
-        if(!(o->width = width))i = rand()%(o->width-width);
-        if(!(o->height = height))j = rand()%(o->height-height);
-        printf("i: %d j: %d\n",i,j);
+        i = (o->height == height)?0:rand()%(o->height-height);
+        j = (o->width == width)?0:rand()%(o->width-width);
         recortes[k].width = width;
         recortes[k].height = height;
         recortes[k].maxval = o->maxval;
@@ -168,7 +167,7 @@ void preencher(struct Image *o){
 void imprimir(struct Image o){
     for(int i=0;i<o.height;i++){
         for(int j=0;j<o.width;j++){
-            printf("%2d ",*(*(o.Data+i)+j));
+            printf("%3d ",*(*(o.Data+i)+j));
         }
         printf("\n");
     }
