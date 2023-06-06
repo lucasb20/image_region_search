@@ -17,6 +17,7 @@ void copy_data(struct Image *,int,int, struct Image *);
 struct Image filtro(struct Image o);
 unsigned char media(struct Image o,int x, int y);
 struct Image *alg1(struct Image *,int,int,int);
+unsigned char *alg2(struct Image o);
 
 int main(int argc,char **argv){
     if(argc != 4){
@@ -44,15 +45,15 @@ int main(int argc,char **argv){
 
     imprimir(foto_filt);
 
-/*     int n = 3;
+    int n = 5;
 
-    struct Image *recortes = alg1(&foto,n,4,9);
+    struct Image *recortes = alg1(&foto_filt,n,5,3);
 
     for(int i=0;i<n;i++){
         printf("Recorte número %d: \n",i);
         imprimir(*(recortes+i));
     }
- */
+
     return 0;
 }
 
@@ -128,6 +129,11 @@ unsigned char media(struct Image o,int x, int y){
 }
 
 //Algoritmo 2: Procurar na imagem a posição de onde foi retirada e um ponteiro para ela.
+
+unsigned char *alg2(struct Image o){
+    //Deixei return 1; só de exemplo, mas tem que retorna um vetor v = [x,y].
+    return 1;
+}
 
 //Esperar Documento do Daniel.
 
