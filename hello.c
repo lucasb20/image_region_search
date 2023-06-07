@@ -17,6 +17,7 @@ void copy_data(struct Image *,int,int, struct Image *);
 struct Image filtro(struct Image o);
 unsigned char media(struct Image o,int x, int y);
 struct Image *alg1(struct Image *,int,int,int);
+unsigned char *alg2(struct Image o);
 
 int main(int argc,char **argv){
     if(argc != 4){
@@ -39,20 +40,20 @@ int main(int argc,char **argv){
     preencher(&foto);
 
     imprimir(foto);
-    
-    /* struct Image foto_filt=filtro(foto); */
 
-    /* imprimir(foto_filt); */
+    struct Image foto_filt=filtro(foto);
 
-/*     int n = 3;
+    imprimir(foto_filt);
 
-    struct Image *recortes = alg1(&foto,n,4,9);
+    int n = 5;
+
+    struct Image *recortes = alg1(&foto_filt,n,5,3);
 
     for(int i=0;i<n;i++){
         printf("Recorte número %d: \n",i);
         imprimir(*(recortes+i));
     }
- */
+
     return 0;
 }
 
@@ -88,65 +89,58 @@ void copy_data(struct Image *src,int x,int y, struct Image *des){
 }
 
 struct Image filtro(struct Image o){
-    struct Image img;
+    struct Image img,aux;
     img.height = o.height;
     img.width = o.width;
     img.maxval = o.maxval;
-    printf("img h: %d, w: %d, m: %d\n",img.height,img.width,img.maxval);
+    if(gerar_matriz(&img))exit(1);
     for(int i=0;i<img.height;i++){
         for(int j=0;j<img.width;j++){
-            /* img.Data[i][j]=media(o,i,j); */
-            printf("Teste %d %d\n",i,j);
+            img.Data[i][j] = o.Data[i][j];
         }
     }
+
+    aux.height = o.height + 2;
+    aux.width = o.height + 2;
+    aux.maxval = o.maxval;
+    if(gerar_matriz(&aux))exit(1);
+
+    for(int i=0;i<img.height;i++){
+        for(int j=0;j<img.width;j++){
+            aux.Data[i+1][j+1] = img.Data[i][j];
+        }
+    }
+
+    for(int i=0;i<img.height;i++){
+        for(int j=0;j<img.width;j++){
+            img.Data[i][j] = media(aux,i+1,j+1);
+        }
+    }
+
+    return img;
 }
 
 unsigned char media(struct Image o,int x, int y){
-    unsigned char m = 0;
+    unsigned char m;
 
-    printf("m: %d",m);
-
-    if(x==0 && y==0){
-        m = (o.Data[x][y]+o.Data[x][y+1]+o.Data[x+1][y]+o.Data[x+1][y+1])/9;
-    }
-    else if(x==0 && y==(o.width-1)){
-        m = (o.Data[x][y]+o.Data[x][y-1]+o.Data[x+1][y]+o.Data[x-1][y+1])/9;
-    }
-    else if(y==0 && x==(o.height-1)){
-        m = (o.Data[x][y]+o.Data[x-1][y]+o.Data[x-1][y+1]+o.Data[x][y+1])/9;
-    }
-    else if(y==(o.width-1) && x==(o.height-1)){
-        m = (o.Data[x][y]+o.Data[x-1][y]+o.Data[x][y-1]+o.Data[x-1][y-1]);
-    }
-    else if(x==0){
-        m = (o.Data[x][y]+o.Data[x][y+1]+o.Data[x+1][y]+o.Data[x+1][y+1]+o.Data[x+1][y-1]+o.Data[x][y-1])/9;
-    }
-    //Parei aqui
-    else if(x==(o.height-1)){
-        m = (o.Data[x][y]+o.Data[x-1][y]+o.Data[x][y+1]+o.Data[x][y-1]+o.Data[x-1][y+1]+o.Data[x-1][y-1])/9;
-    }
-    if(y==0){
-        m = (o.Data[x][y]+o.Data[x-1][y]+o.Data[x+1][y]+o.Data[x-1][y+1]+o.Data[x][y+1]+o.Data[x+1][y+1])/9;
-    }
-    if(y==(o.width-1)){
-        m = (o.Data[x][y]+o.Data[x-1][y]+o.Data[x+1][y]+o.Data[x][y-1]+o.Data[x-1][y-1]+o.Data[x+1][y-1])/9;
-    }
-    else{
-        m = (o.Data[x][y]+o.Data[x+1][y]+o.Data[x-1][y]+o.Data[x][y+1]+o.Data[x][y-1]+o.Data[x-1][y-1]+o.Data[x+1][y+1]+o.Data[x+1][y-1]+o.Data[x-1][y+1])/9;
-    }
+    m = (o.Data[x][y]+o.Data[x][y+1]+o.Data[x][y-1]+o.Data[x-1][y]+o.Data[x-1][y+1]+o.Data[x-1][y-1]+o.Data[x+1][y]+o.Data[x+1][y+1]+o.Data[x+1][y-1])/9;
 
     return m;
 }
 
 //Algoritmo 2: Procurar na imagem a posição de onde foi retirada e um ponteiro para ela.
 
+unsigned char *alg2(struct Image o){
+    //Deixei return 1; só de exemplo, mas tem que retorna um vetor v = [x,y].
+    return 1;
+}
+
 //Esperar Documento do Daniel.
 
 int gerar_matriz(struct Image *o){
-    if(!(o->Data = (unsigned char **)malloc(o->height*sizeof(unsigned char*)))){
+    if(!(o->Data = (unsigned char **)calloc(o->height,sizeof(unsigned char*)))){
         return 1;
     }
-
     for(int i=0;i<o->height;i++){
             if(!(o->Data[i]=(unsigned char *)calloc(o->width,sizeof(unsigned char)))){
                 return 1;

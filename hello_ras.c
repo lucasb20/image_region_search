@@ -17,7 +17,9 @@ void copy_data(struct Image *,int,int, struct Image *);
 struct Image filtro(struct Image o);
 unsigned char media(struct Image o,int x, int y);
 struct Image *alg1(struct Image *,int,int,int);
-unsigned char *alg2(struct Image o);
+int *alg2(struct Image src,struct Image rec);
+double quad(double x);
+double erro_mq(struct Image o, int x, int y);
 
 int main(int argc,char **argv){
     if(argc != 4){
@@ -39,20 +41,15 @@ int main(int argc,char **argv){
 
     preencher(&foto);
 
+    printf("Imagem aleatória.\n");
     imprimir(foto);
+    printf("Erro Médio Quadrático: %f\n",erro_mq(foto,1,1));
 
     struct Image foto_filt=filtro(foto);
 
+    printf("Imagem filtrada.\n");
     imprimir(foto_filt);
-
-    int n = 5;
-
-    struct Image *recortes = alg1(&foto_filt,n,5,3);
-
-    for(int i=0;i<n;i++){
-        printf("Recorte número %d: \n",i);
-        imprimir(*(recortes+i));
-    }
+    printf("Erro Médio Quadrático: %f\n",erro_mq(foto_filt,1,1));
 
     return 0;
 }
@@ -130,9 +127,26 @@ unsigned char media(struct Image o,int x, int y){
 
 //Algoritmo 2: Procurar na imagem a posição de onde foi retirada e um ponteiro para ela.
 
-unsigned char *alg2(struct Image o){
-    //Deixei return 1; só de exemplo, mas tem que retorna um vetor v = [x,y].
-    return 1;
+//Tem que retorna um vetor v = [x,y].
+int *alg2(struct Image src,struct Image rec){
+    int *p=NULL;
+    return p;
+}
+
+//Algoritmo não funcionando para qualquer caso, só para recortes 3 por 3
+double erro_mq(struct Image o, int x, int y){
+    double media = (o.Data[x][y-1]+o.Data[x][y]+o.Data[x][y+1]+o.Data[x+1][y-1]+o.Data[x+1][y]+o.Data[x+1][y+1]+o.Data[x-1][y-1]+o.Data[x-1][y]+o.Data[x-1][y+1])/9;
+    double res=0;
+    for(int i=-1;i<2;i++){
+        for(int j=-1;j<2;j++){
+            res+=quad((double)o.Data[x+i][y+j]-media);
+        }
+    }
+    return res/9;
+}
+
+double quad(double x){
+    return x*x;
 }
 
 //Esperar Documento do Daniel.
