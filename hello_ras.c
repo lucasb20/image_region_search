@@ -19,7 +19,8 @@ unsigned char media(struct Image o,int x, int y);
 struct Image *alg1(struct Image *,int,int,int);
 int *alg2(struct Image src,struct Image rec);
 double quad(double x);
-double erro_mq(struct Image o, int x, int y);
+double erro_mq(unsigned char *v,int tam);
+double modul(double x);
 
 int main(int argc,char **argv){
     if(argc != 4){
@@ -43,13 +44,13 @@ int main(int argc,char **argv){
 
     printf("Imagem aleatória.\n");
     imprimir(foto);
-    printf("Erro Médio Quadrático: %f\n",erro_mq(foto,1,1));
 
     struct Image foto_filt=filtro(foto);
 
     printf("Imagem filtrada.\n");
     imprimir(foto_filt);
-    printf("Erro Médio Quadrático: %f\n",erro_mq(foto_filt,1,1));
+
+
 
     return 0;
 }
@@ -130,23 +131,67 @@ unsigned char media(struct Image o,int x, int y){
 //Tem que retorna um vetor v = [x,y].
 int *alg2(struct Image src,struct Image rec){
     int *p=NULL;
+    unsigned char *v;
+    double emq_rec;
+    double emq_aux;
+    double menor_dif;
+    
+    // p = [x,y]
+    p = calloc(2,sizeof(int));
+    v = calloc(rec.width*rec.height,sizeof(unsigned char));
+
+    for(int a=0;a<rec.height;a++){
+        for(int b=0;b<rec.width;b++){
+            *(v+b+a*rec.height)=rec.Data[a][b];
+        }
+    }
+
+    emq_rec = erro_mq(v,rec.width*rec.height);
+
+    for(int a=0;a<rec.height;a++){
+        for(int b=0;b<rec.width;b++){
+            *(v+b+a*rec.height)=src.Data[a][b];
+        }
+    }
+
+    emq_aux = erro_mq(v,rec.width*rec.height);
+
+    menor_dif = modul(emq_aux - emq_rec);
+
+    for(int i=0;i<src.height-rec.height+1;i++){
+        for(int j=0;j<src.width-rec.width+1;j++){
+            for(int a=0;a<rec.height;a++){
+                for(int b=0;b<rec.width;b++){
+                    *(v+b+a*rec.height)=src.Data[i+a][j+b];
+                }
+            }
+            emq_aux = erro_mq(v,rec.width*rec.height);
+            if(modul(emq_aux-emq_rec)<menor_dif){
+                menor_dif = modul(emq_aux-emq_rec);
+                *p = i;
+                *(p+1) = j;
+            }
+        }
+    }
+
     return p;
 }
 
-//Algoritmo não funcionando para qualquer caso, só para recortes 3 por 3
-double erro_mq(struct Image o, int x, int y){
-    double media = (o.Data[x][y-1]+o.Data[x][y]+o.Data[x][y+1]+o.Data[x+1][y-1]+o.Data[x+1][y]+o.Data[x+1][y+1]+o.Data[x-1][y-1]+o.Data[x-1][y]+o.Data[x-1][y+1])/9;
+double erro_mq(unsigned char *v,int tam){
+    double media = 0;
     double res=0;
-    for(int i=-1;i<2;i++){
-        for(int j=-1;j<2;j++){
-            res+=quad((double)o.Data[x+i][y+j]-media);
-        }
-    }
-    return res/9;
+    for(int i=0;i<tam;i++)media+=*(v+i);
+    media/=tam;
+    for(int i=0;i<tam;i++)res+=quad(*(v+i)-media);
+    return res/tam;
 }
 
 double quad(double x){
     return x*x;
+}
+
+double modul(double x){
+    return (x>=0)?x:-x;
 }
 
 //Esperar Documento do Daniel.
