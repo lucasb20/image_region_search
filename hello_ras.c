@@ -23,17 +23,13 @@ double erro_mq(unsigned char *v,int tam);
 double modul(double x);
 
 int main(int argc,char **argv){
-    if(argc != 4){
-        printf("Formato: %s <width> <height> <max value>\n",*argv);
-        exit(1);
-    }
 
     srand(time(NULL));
 
     struct Image foto;
-    foto.width = atoi(*(argv+1));
-    foto.height = atoi(*(argv+2));
-    foto.maxval = atoi(*(argv+3));
+    foto.width = 7;
+    foto.height = 3;
+    foto.maxval = 255;
 
     if(gerar_matriz(&foto)){
         puts("Faltou memória.");
@@ -42,21 +38,26 @@ int main(int argc,char **argv){
 
     preencher(&foto);
 
-    printf("Imagem aleatória.\n");
+    struct Image foto_f=filtro(foto);
+
+    printf("Imagem aleatória:\n");
     imprimir(foto);
+    printf("Imagem filtrada:\n");
+    imprimir(foto_f);
 
-    struct Image foto_filt=filtro(foto);
+    struct Image *recorte;
 
-    printf("Imagem filtrada.\n");
-    imprimir(foto_filt);
+    printf("Recorte:\n");
+    recorte = alg1(&foto_f,1,2,2);
+    imprimir(*recorte);
 
-
+    int *pos = alg2(foto,*recorte);
+    printf("alg2 encontrou:\nx: %d, y: %d.\n",*pos,*(pos+1));
 
     return 0;
 }
 
 //Algoritmo 1: Fazer N recortes aleatórios de tamanho L*M (E um ponteiro para cada posição?) com o filtro média.
-
 struct Image *alg1(struct Image *o,int n,int width,int height){
     int k = 0;
     int i=0,j=0;
