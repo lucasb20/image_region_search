@@ -17,20 +17,20 @@ void copy_data(struct Image *,int,int, struct Image *);
 struct Image filtro(struct Image o);
 unsigned char media(struct Image o,int x, int y);
 struct Image *alg1(struct Image *,int,int,int);
-unsigned char *alg2(struct Image o);
+int *alg2(struct Image src,struct Image rec);
+double quad(double x);
+double erro_mq(double *v,int tam);
+double modul(double x);
+double media_data(struct Image o);
 
 int main(int argc,char **argv){
-    if(argc != 4){
-        printf("Formato: %s <width> <height> <max value>\n",*argv);
-        exit(1);
-    }
 
     srand(time(NULL));
 
     struct Image foto;
-    foto.width = atoi(*(argv+1));
-    foto.height = atoi(*(argv+2));
-    foto.maxval = atoi(*(argv+3));
+    foto.width = 10;
+    foto.height = 10;
+    foto.maxval = 255;
 
     if(gerar_matriz(&foto)){
         puts("Faltou memória.");
@@ -39,26 +39,20 @@ int main(int argc,char **argv){
 
     preencher(&foto);
 
+    struct Image foto_f=filtro(foto);
+
+    printf("Imagem aleatória:\n");
     imprimir(foto);
 
-    struct Image foto_filt=filtro(foto);
+    struct Image *recorte;
 
-    imprimir(foto_filt);
-
-    int n = 5;
-
-    struct Image *recortes = alg1(&foto_filt,n,5,3);
-
-    for(int i=0;i<n;i++){
-        printf("Recorte número %d: \n",i);
-        imprimir(*(recortes+i));
-    }
-
+    printf("Recorte:\n");
+    recorte = alg1(&foto_f,1,2,2);
+    int *pos = alg2(foto,*recorte);
     return 0;
 }
 
 //Algoritmo 1: Fazer N recortes aleatórios de tamanho L*M (E um ponteiro para cada posição?) com o filtro média.
-
 struct Image *alg1(struct Image *o,int n,int width,int height){
     int k = 0;
     int i=0,j=0;
@@ -130,9 +124,89 @@ unsigned char media(struct Image o,int x, int y){
 
 //Algoritmo 2: Procurar na imagem a posição de onde foi retirada e um ponteiro para ela.
 
-unsigned char *alg2(struct Image o){
-    //Deixei return 1; só de exemplo, mas tem que retorna um vetor v = [x,y].
-    return 1;
+//Tem que retorna um vetor v = [x,y].
+int *alg2(struct Image src,struct Image rec){
+    int *p=NULL;
+    double *v;
+    double emq_rec;
+    double emq_aux;
+    double menor_dif;
+
+    //debugg
+    double media_rec = media_data(rec);
+    double media_src = media_data(src);
+
+    // p = [x,y]
+    p = calloc(2,sizeof(int));
+    v = calloc(rec.width*rec.height,sizeof(unsigned char));
+
+    for(int a=0;a<rec.height;a++){
+        for(int b=0;b<rec.width;b++){
+            *(v+b+a*rec.height)=(rec.Data[a][b]/media_rec);
+        }
+    }
+
+    emq_rec = erro_mq(v,rec.width*rec.height);
+
+    for(int a=0;a<rec.height;a++){
+        for(int b=0;b<rec.width;b++){
+            *(v+b+a*rec.height)=(src.Data[a][b]/media_src);
+        }
+    }
+
+    emq_aux = erro_mq(v,rec.width*rec.height);
+
+    menor_dif = modul(emq_aux - emq_rec);
+
+    //Vários debuggs
+    printf("emq_rec[recorte]: %f\n",emq_rec);
+
+    for(int i=0;i<src.height-rec.height+1;i++){
+        for(int j=0;j<src.width-rec.width+1;j++){
+            for(int a=0;a<rec.height;a++){
+                for(int b=0;b<rec.width;b++){
+                    *(v+b+a*rec.height)=(src.Data[i+a][j+b]/media_src);
+                }
+            }
+            emq_aux = erro_mq(v,rec.width*rec.height);
+            printf("emq_aux[%d][%d]: %f\n",i,j,emq_aux);
+            if(modul(emq_aux-emq_rec)<menor_dif){
+                menor_dif = modul(emq_aux-emq_rec);
+                *p = i;
+                *(p+1) = j;
+            }
+        }
+    }
+
+    return p;
+}
+
+double erro_mq(double *v,int tam){
+    double media = 0;
+    double res=0;
+    for(int i=0;i<tam;i++)media+=*(v+i);
+    media/=tam;
+    for(int i=0;i<tam;i++)res+=quad(*(v+i)-media);
+    return res/tam;
+}
+
+double quad(double x){
+    return x*x;
+}
+
+double modul(double x){
+    return (x>=0)?x:-x;
+}
+
+double media_data(struct Image o){
+    double media=0;
+    for(int i=0;i<o.height;i++){
+        for(int j=0;j<o.width;j++){
+            media+=o.Data[i][j];
+        }
+    }
+    media /= o.height*o.width;
+    return media;
 }
 
 //Esperar Documento do Daniel.

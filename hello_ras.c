@@ -9,6 +9,9 @@ struct Image{
     unsigned char **Data;
 };
 
+//Debugg
+int posx,posy;
+
 int gerar_matriz(struct Image *o);
 void preencher(struct Image *o);
 void imprimir(struct Image o);
@@ -19,16 +22,17 @@ unsigned char media(struct Image o,int x, int y);
 struct Image *alg1(struct Image *,int,int,int);
 int *alg2(struct Image src,struct Image rec);
 double quad(double x);
-double erro_mq(unsigned char *v,int tam);
+double erro_mq(double *v,int tam);
 double modul(double x);
+double media_data(struct Image o);
 
 int main(int argc,char **argv){
 
     srand(time(NULL));
 
     struct Image foto;
-    foto.width = 7;
-    foto.height = 3;
+    foto.width = 10;
+    foto.height = 10;
     foto.maxval = 255;
 
     if(gerar_matriz(&foto)){
@@ -42,17 +46,17 @@ int main(int argc,char **argv){
 
     printf("Imagem aleatória:\n");
     imprimir(foto);
-    printf("Imagem filtrada:\n");
-    imprimir(foto_f);
 
     struct Image *recorte;
 
     printf("Recorte:\n");
-    recorte = alg1(&foto_f,1,2,2);
-    imprimir(*recorte);
-
+    recorte = alg1(&foto_f,1,3,3);
     int *pos = alg2(foto,*recorte);
+
+    //debugg
+    printf("i: %d, j: %d\n",posx,posy);
     printf("alg2 encontrou:\nx: %d, y: %d.\n",*pos,*(pos+1));
+    //debugg
 
     return 0;
 }
@@ -71,6 +75,10 @@ struct Image *alg1(struct Image *o,int n,int width,int height){
         gerar_matriz(recortes+k);
         copy_data(o,i,j,&recortes[k]);
         k++;
+        //Debugg
+        posx = i;
+        posy = j;
+        //Debugg
     }
     return recortes;
 }
@@ -132,18 +140,27 @@ unsigned char media(struct Image o,int x, int y){
 //Tem que retorna um vetor v = [x,y].
 int *alg2(struct Image src,struct Image rec){
     int *p=NULL;
-    unsigned char *v;
+    //Talvez tenha que voltar para unsigned char *
+    double *v;
     double emq_rec;
     double emq_aux;
     double menor_dif;
-    
+
+    //debugg
+    double media_rec = media_data(rec);
+    printf("media_rec: %f\n",media_rec);
+    double media_src = media_data(src);
+    printf("media_src: %f\n",media_src);
+
     // p = [x,y]
     p = calloc(2,sizeof(int));
+    if(!p)exit(1);
     v = calloc(rec.width*rec.height,sizeof(unsigned char));
+    if(!v)exit(1);
 
     for(int a=0;a<rec.height;a++){
         for(int b=0;b<rec.width;b++){
-            *(v+b+a*rec.height)=rec.Data[a][b];
+            *(v+b+a*rec.height)=(rec.Data[a][b]/(media_rec));
         }
     }
 
@@ -151,7 +168,7 @@ int *alg2(struct Image src,struct Image rec){
 
     for(int a=0;a<rec.height;a++){
         for(int b=0;b<rec.width;b++){
-            *(v+b+a*rec.height)=src.Data[a][b];
+            *(v+b+a*rec.height)=(src.Data[a][b]/media_src);
         }
     }
 
@@ -159,11 +176,14 @@ int *alg2(struct Image src,struct Image rec){
 
     menor_dif = modul(emq_aux - emq_rec);
 
+    //Vários debuggs
+    printf("emq_rec[recorte]: %f\n",emq_rec);
+
     for(int i=0;i<src.height-rec.height+1;i++){
         for(int j=0;j<src.width-rec.width+1;j++){
             for(int a=0;a<rec.height;a++){
                 for(int b=0;b<rec.width;b++){
-                    *(v+b+a*rec.height)=src.Data[i+a][j+b];
+                    *(v+b+a*rec.height)=(src.Data[i+a][j+b]/media_src);
                 }
             }
             emq_aux = erro_mq(v,rec.width*rec.height);
@@ -178,13 +198,13 @@ int *alg2(struct Image src,struct Image rec){
     return p;
 }
 
-double erro_mq(unsigned char *v,int tam){
+double erro_mq(double *v,int tam){
     double media = 0;
     double res=0;
     for(int i=0;i<tam;i++)media+=*(v+i);
     media/=tam;
-    for(int i=0;i<tam;i++)res+=quad(*(v+i)-media);
-    return res/tam;
+    for(int i=0;i<tam;i++)res+=(quad(*(v+i)-media));
+    return res;
 }
 
 double quad(double x){
@@ -193,6 +213,17 @@ double quad(double x){
 
 double modul(double x){
     return (x>=0)?x:-x;
+}
+
+double media_data(struct Image o){
+    double media=0;
+    for(int i=0;i<o.height;i++){
+        for(int j=0;j<o.width;j++){
+            media+=o.Data[i][j];
+        }
+    }
+    media /= o.height*o.width;
+    return media;
 }
 
 //Esperar Documento do Daniel.
