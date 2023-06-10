@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include <time.h>
 
 struct Image{
@@ -18,13 +19,10 @@ struct Image filtro(struct Image o);
 unsigned char media(struct Image o,int x, int y);
 struct Image *alg1(struct Image *,int,int,int);
 int *alg2(struct Image src,struct Image rec);
-double quad(double x);
-double erro_mq(double *v,int tam);
-double modul(double x);
+double correlacao_cruzada(unsigned char **src, double **rec, int src_height, int src_width, int rec_height, int rec_width, int i, int j);
 double media_data(struct Image o);
 
 int main(int argc,char **argv){
-
     srand(time(NULL));
 
     struct Image foto;
@@ -49,6 +47,8 @@ int main(int argc,char **argv){
     printf("Recorte:\n");
     recorte = alg1(&foto_f,1,2,2);
     int *pos = alg2(foto,*recorte);
+
+    printf("alg2 encontrou x: %d, y: %d.\n",*pos,*(pos+1));
     return 0;
 }
 
@@ -123,79 +123,89 @@ unsigned char media(struct Image o,int x, int y){
 }
 
 //Algoritmo 2: Procurar na imagem a posição de onde foi retirada e um ponteiro para ela.
-
 //Tem que retorna um vetor v = [x,y].
-int *alg2(struct Image src,struct Image rec){
-    int *p=NULL;
-    double *v;
-    double emq_rec;
-    double emq_aux;
-    double menor_dif;
 
-    //debugg
+double correlacao_cruzada(unsigned char **src, double **rec, int src_height, int src_width, int rec_height, int rec_width, int i, int j) {
+    double soma = 0.0;
+    double media_src = 0.0;
+    double media_rec = 0.0;
+    double desvio_padrao_src = 0.0;
+    double desvio_padrao_rec = 0.0;
+
+    // Calcula a média das matrizes src e rec
+    for (int a = 0; a < rec_height; a++) {
+        for (int b = 0; b < rec_width; b++) {
+            media_src += src[i+a][j+b];
+            media_rec += rec[a][b];
+        }
+    }
+    media_src /= (src_height * src_width);
+    media_rec /= (rec_height * rec_width);
+
+    // Calcula o desvio padrão das matrizes src e rec
+    for (int a = 0; a < rec_height; a++) {
+        for (int b = 0; b < rec_width; b++) {
+            desvio_padrao_src += pow(src[i+a][j+b] - media_src, 2);
+            desvio_padrao_rec += pow(rec[a][b] - media_rec, 2);
+        }
+    }
+    desvio_padrao_src = sqrt(desvio_padrao_src / (src_height * src_width));
+    desvio_padrao_rec = sqrt(desvio_padrao_rec / (rec_height * rec_width));
+
+    // Calcula a correlação cruzada entre as matrizes src e rec
+    for (int a = 0; a < rec_height; a++) {
+        for (int b = 0; b < rec_width; b++) {
+            soma += ((src[i+a][j+b] - media_src) / desvio_padrao_src) * ((rec[a][b] - media_rec) / desvio_padrao_rec);
+        }
+    }
+
+    return soma;
+}
+
+int *alg2(struct Image src, struct Image rec) {
+    int *p = NULL;
+    double **v = NULL;
+    double maior_corr = -INFINITY;
+
+    // Aloca memória para o array de inteiros p e a matriz v
+    p = calloc(2, sizeof(int));
+    if (!p) exit(1);
+    v = calloc(rec.height, sizeof(double *));
+    if (!v) exit(1);
+    for (int i = 0; i < rec.height; i++) {
+        v[i] = calloc(rec.width, sizeof(double));
+        if (!v[i]) exit(1);
+    }
+
+    // Normaliza a matriz rec
     double media_rec = media_data(rec);
-    double media_src = media_data(src);
-
-    // p = [x,y]
-    p = calloc(2,sizeof(int));
-    v = calloc(rec.width*rec.height,sizeof(unsigned char));
-
-    for(int a=0;a<rec.height;a++){
-        for(int b=0;b<rec.width;b++){
-            *(v+b+a*rec.height)=(rec.Data[a][b]/media_rec);
+    for (int a = 0; a < rec.height; a++) {
+        for (int b = 0; b < rec.width; b++) {
+            v[a][b] = (double)rec.Data[a][b] / media_rec;
         }
     }
 
-    emq_rec = erro_mq(v,rec.width*rec.height);
-
-    for(int a=0;a<rec.height;a++){
-        for(int b=0;b<rec.width;b++){
-            *(v+b+a*rec.height)=(src.Data[a][b]/media_src);
-        }
-    }
-
-    emq_aux = erro_mq(v,rec.width*rec.height);
-
-    menor_dif = modul(emq_aux - emq_rec);
-
-    //Vários debuggs
-    printf("emq_rec[recorte]: %f\n",emq_rec);
-
-    for(int i=0;i<src.height-rec.height+1;i++){
-        for(int j=0;j<src.width-rec.width+1;j++){
-            for(int a=0;a<rec.height;a++){
-                for(int b=0;b<rec.width;b++){
-                    *(v+b+a*rec.height)=(src.Data[i+a][j+b]/media_src);
-                }
-            }
-            emq_aux = erro_mq(v,rec.width*rec.height);
-            printf("emq_aux[%d][%d]: %f\n",i,j,emq_aux);
-            if(modul(emq_aux-emq_rec)<menor_dif){
-                menor_dif = modul(emq_aux-emq_rec);
-                *p = i;
-                *(p+1) = j;
+    // Percorre todas as possíveis posições na matriz src onde a matriz rec pode ser colocada
+    for (int i = 0; i < src.height - rec.height + 1; i++) {
+        for (int j = 0; j < src.width - rec.width + 1; j++) {
+            // Calcula a correlação cruzada entre as matrizes src e rec na posição (i, j)
+            double corr = correlacao_cruzada(src.Data, v, src.height, src.width, rec.height, rec.width, i, j);
+            if (corr > maior_corr) {
+                maior_corr = corr;
+                p[0] = i;
+                p[1] = j;
             }
         }
+        printf("Demora: %d/%d\n",i,src.height - rec.height);
     }
+
+    // Libera a memória alocada para a matriz v
+    for (int i = 0; i < rec.height; i++) {
+        free(v[i]);
+    }
+    free(v);
 
     return p;
-}
-
-double erro_mq(double *v,int tam){
-    double media = 0;
-    double res=0;
-    for(int i=0;i<tam;i++)media+=*(v+i);
-    media/=tam;
-    for(int i=0;i<tam;i++)res+=quad(*(v+i)-media);
-    return res/tam;
-}
-
-double quad(double x){
-    return x*x;
-}
-
-double modul(double x){
-    return (x>=0)?x:-x;
 }
 
 double media_data(struct Image o){

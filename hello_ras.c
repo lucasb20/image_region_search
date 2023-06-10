@@ -30,8 +30,8 @@ int main(int argc,char **argv){
     srand(time(NULL));
 
     struct Image foto;
-    foto.width = 300;
-    foto.height = 300;
+    foto.width = 1000;
+    foto.height = 1000;
     foto.maxval = 255;
 
     if(gerar_matriz(&foto)){
@@ -40,19 +40,9 @@ int main(int argc,char **argv){
     }
 
     preencher(&foto);
-
     struct Image foto_f=filtro(foto);
-
-    printf("Imagem aleatória:\n");
-    imprimir(foto);
-
-    printf("Imagem filtrada:\n");
-    imprimir(foto_f);
-
     struct Image *recorte;
-
-    printf("Recorte:\n");
-    recorte = alg1(&foto_f,1,20,20);
+    recorte = alg1(&foto_f,1,100,100);
 
     int *pos = alg2_cor(foto,*recorte);
     printf("alg2 encontrou => x: %d, y: %d\n",*pos,*(pos+1));
@@ -74,7 +64,7 @@ struct Image *alg1(struct Image *o,int n,int width,int height){
         gerar_matriz(recortes+k);
         copy_data(o,i,j,&recortes[k]);
         k++;
-        printf("i: %d, j: %d\n",i,j);
+        printf("Recorte: i: %d, j: %d\n",i,j);
     }
     return recortes;
 }
@@ -134,73 +124,6 @@ unsigned char media(struct Image o,int x, int y){
 //Algoritmo 2: Procurar na imagem a posição de onde foi retirada e um ponteiro para ela.
 
 //Tem que retorna um vetor v = [x,y].
-int *alg2(struct Image src,struct Image rec){
-    int *p=NULL;
-
-    double *v;
-    double emq_rec;
-    double emq_aux;
-    double menor_dif;
-
-    // p = [x,y]
-    p = calloc(2,sizeof(int));
-    if(!p)exit(1);
-    v = calloc(rec.width*rec.height,sizeof(unsigned char));
-    if(!v)exit(1);
-
-    for(int a=0;a<rec.height;a++){
-        for(int b=0;b<rec.width;b++){
-            *(v+b+a*rec.height)=rec.Data[a][b];
-        }
-    }
-
-    emq_rec = erro_mq(v,rec.width*rec.height);
-
-    for(int a=0;a<rec.height;a++){
-        for(int b=0;b<rec.width;b++){
-            *(v+b+a*rec.height)=src.Data[a][b];
-        }
-    }
-
-    emq_aux = erro_mq(v,rec.width*rec.height);
-
-    menor_dif = modul(emq_aux - emq_rec);
-
-    for(int i=0;i<src.height-rec.height+1;i++){
-        for(int j=0;j<src.width-rec.width+1;j++){
-            for(int a=0;a<rec.height;a++){
-                for(int b=0;b<rec.width;b++){
-                    *(v+b+a*rec.height)=src.Data[i+a][j+b];
-                }
-            }
-            emq_aux = erro_mq(v,rec.width*rec.height);
-            if(modul(emq_aux-emq_rec)<menor_dif){
-                menor_dif = modul(emq_aux-emq_rec);
-                *p = i;
-                *(p+1) = j;
-            }
-        }
-    }
-
-    return p;
-}
-
-double erro_mq(double *v,int tam){
-    double media = 0;
-    double res=0;
-    for(int i=0;i<tam;i++)media+=*(v+i);
-    media/=tam;
-    for(int i=0;i<tam;i++)res+=(quad(*(v+i)-media));
-    return res;
-}
-
-double quad(double x){
-    return x*x;
-}
-
-double modul(double x){
-    return (x>=0)?x:-x;
-}
 
 double media_data(struct Image o){
     double media=0;
@@ -324,6 +247,7 @@ int *alg2_cor(struct Image src, struct Image rec) {
                 p[1] = j;
             }
         }
+        printf("Demora: %d/%d\n",i,src.height - rec.height);
     }
 
     // Libera a memória alocada para a matriz v
@@ -334,3 +258,71 @@ int *alg2_cor(struct Image src, struct Image rec) {
 
     return p;
 }
+
+/* int *alg2(struct Image src,struct Image rec){
+    int *p=NULL;
+
+    double *v;
+    double emq_rec;
+    double emq_aux;
+    double menor_dif;
+
+    // p = [x,y]
+    p = calloc(2,sizeof(int));
+    if(!p)exit(1);
+    v = calloc(rec.width*rec.height,sizeof(unsigned char));
+    if(!v)exit(1);
+
+    for(int a=0;a<rec.height;a++){
+        for(int b=0;b<rec.width;b++){
+            *(v+b+a*rec.height)=rec.Data[a][b];
+        }
+    }
+
+    emq_rec = erro_mq(v,rec.width*rec.height);
+
+    for(int a=0;a<rec.height;a++){
+        for(int b=0;b<rec.width;b++){
+            *(v+b+a*rec.height)=src.Data[a][b];
+        }
+    }
+
+    emq_aux = erro_mq(v,rec.width*rec.height);
+
+    menor_dif = modul(emq_aux - emq_rec);
+
+    for(int i=0;i<src.height-rec.height+1;i++){
+        for(int j=0;j<src.width-rec.width+1;j++){
+            for(int a=0;a<rec.height;a++){
+                for(int b=0;b<rec.width;b++){
+                    *(v+b+a*rec.height)=src.Data[i+a][j+b];
+                }
+            }
+            emq_aux = erro_mq(v,rec.width*rec.height);
+            if(modul(emq_aux-emq_rec)<menor_dif){
+                menor_dif = modul(emq_aux-emq_rec);
+                *p = i;
+                *(p+1) = j;
+            }
+        }
+    }
+
+    return p;
+}
+ */
+/* double erro_mq(double *v,int tam){
+    double media = 0;
+    double res=0;
+    for(int i=0;i<tam;i++)media+=*(v+i);
+    media/=tam;
+    for(int i=0;i<tam;i++)res+=(quad(*(v+i)-media));
+    return res;
+}
+
+double quad(double x){
+    return x*x;
+}
+
+double modul(double x){
+    return (x>=0)?x:-x;
+} */
