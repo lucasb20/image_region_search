@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include <time.h>
 
 struct Image{
@@ -8,9 +9,6 @@ struct Image{
     int maxval;
     unsigned char **Data;
 };
-
-//Debugg
-int posx,posy;
 
 int gerar_matriz(struct Image *o);
 void preencher(struct Image *o);
@@ -25,14 +23,15 @@ double quad(double x);
 double erro_mq(double *v,int tam);
 double modul(double x);
 double media_data(struct Image o);
+double correlacao_cruzada(unsigned char **src, double **rec, int src_height, int src_width, int rec_height, int rec_width, int i, int j);
+int *alg2_cor(struct Image src, struct Image rec);
 
 int main(int argc,char **argv){
-
     srand(time(NULL));
 
     struct Image foto;
-    foto.width = 10;
-    foto.height = 10;
+    foto.width = 300;
+    foto.height = 300;
     foto.maxval = 255;
 
     if(gerar_matriz(&foto)){
@@ -47,16 +46,16 @@ int main(int argc,char **argv){
     printf("Imagem aleatória:\n");
     imprimir(foto);
 
+    printf("Imagem filtrada:\n");
+    imprimir(foto_f);
+
     struct Image *recorte;
 
     printf("Recorte:\n");
-    recorte = alg1(&foto_f,1,3,3);
-    int *pos = alg2(foto,*recorte);
+    recorte = alg1(&foto_f,1,20,20);
 
-    //debugg
-    printf("i: %d, j: %d\n",posx,posy);
-    printf("alg2 encontrou:\nx: %d, y: %d.\n",*pos,*(pos+1));
-    //debugg
+    int *pos = alg2_cor(foto,*recorte);
+    printf("alg2 encontrou => x: %d, y: %d\n",*pos,*(pos+1));
 
     return 0;
 }
@@ -75,10 +74,7 @@ struct Image *alg1(struct Image *o,int n,int width,int height){
         gerar_matriz(recortes+k);
         copy_data(o,i,j,&recortes[k]);
         k++;
-        //Debugg
-        posx = i;
-        posy = j;
-        //Debugg
+        printf("i: %d, j: %d\n",i,j);
     }
     return recortes;
 }
@@ -140,17 +136,11 @@ unsigned char media(struct Image o,int x, int y){
 //Tem que retorna um vetor v = [x,y].
 int *alg2(struct Image src,struct Image rec){
     int *p=NULL;
-    //Talvez tenha que voltar para unsigned char *
+
     double *v;
     double emq_rec;
     double emq_aux;
     double menor_dif;
-
-    //debugg
-    double media_rec = media_data(rec);
-    printf("media_rec: %f\n",media_rec);
-    double media_src = media_data(src);
-    printf("media_src: %f\n",media_src);
 
     // p = [x,y]
     p = calloc(2,sizeof(int));
@@ -160,7 +150,7 @@ int *alg2(struct Image src,struct Image rec){
 
     for(int a=0;a<rec.height;a++){
         for(int b=0;b<rec.width;b++){
-            *(v+b+a*rec.height)=(rec.Data[a][b]/(media_rec));
+            *(v+b+a*rec.height)=rec.Data[a][b];
         }
     }
 
@@ -168,7 +158,7 @@ int *alg2(struct Image src,struct Image rec){
 
     for(int a=0;a<rec.height;a++){
         for(int b=0;b<rec.width;b++){
-            *(v+b+a*rec.height)=(src.Data[a][b]/media_src);
+            *(v+b+a*rec.height)=src.Data[a][b];
         }
     }
 
@@ -176,14 +166,11 @@ int *alg2(struct Image src,struct Image rec){
 
     menor_dif = modul(emq_aux - emq_rec);
 
-    //Vários debuggs
-    printf("emq_rec[recorte]: %f\n",emq_rec);
-
     for(int i=0;i<src.height-rec.height+1;i++){
         for(int j=0;j<src.width-rec.width+1;j++){
             for(int a=0;a<rec.height;a++){
                 for(int b=0;b<rec.width;b++){
-                    *(v+b+a*rec.height)=(src.Data[i+a][j+b]/media_src);
+                    *(v+b+a*rec.height)=src.Data[i+a][j+b];
                 }
             }
             emq_aux = erro_mq(v,rec.width*rec.height);
@@ -264,4 +251,86 @@ void desalocar_matriz(struct Image *o){
         free(o->Data[i]);
     }
     free(o->Data);
+}
+
+double correlacao_cruzada(unsigned char **src, double **rec, int src_height, int src_width, int rec_height, int rec_width, int i, int j) {
+    double soma = 0.0;
+    double media_src = 0.0;
+    double media_rec = 0.0;
+    double desvio_padrao_src = 0.0;
+    double desvio_padrao_rec = 0.0;
+
+    // Calcula a média das matrizes src e rec
+    for (int a = 0; a < rec_height; a++) {
+        for (int b = 0; b < rec_width; b++) {
+            media_src += src[i+a][j+b];
+            media_rec += rec[a][b];
+        }
+    }
+    media_src /= (src_height * src_width);
+    media_rec /= (rec_height * rec_width);
+
+    // Calcula o desvio padrão das matrizes src e rec
+    for (int a = 0; a < rec_height; a++) {
+        for (int b = 0; b < rec_width; b++) {
+            desvio_padrao_src += pow(src[i+a][j+b] - media_src, 2);
+            desvio_padrao_rec += pow(rec[a][b] - media_rec, 2);
+        }
+    }
+    desvio_padrao_src = sqrt(desvio_padrao_src / (src_height * src_width));
+    desvio_padrao_rec = sqrt(desvio_padrao_rec / (rec_height * rec_width));
+
+    // Calcula a correlação cruzada entre as matrizes src e rec
+    for (int a = 0; a < rec_height; a++) {
+        for (int b = 0; b < rec_width; b++) {
+            soma += ((src[i+a][j+b] - media_src) / desvio_padrao_src) * ((rec[a][b] - media_rec) / desvio_padrao_rec);
+        }
+    }
+
+    return soma;
+}
+
+int *alg2_cor(struct Image src, struct Image rec) {
+    int *p = NULL;
+    double **v = NULL;
+    double maior_corr = -INFINITY;
+
+    // Aloca memória para o array de inteiros p e a matriz v
+    p = calloc(2, sizeof(int));
+    if (!p) exit(1);
+    v = calloc(rec.height, sizeof(double *));
+    if (!v) exit(1);
+    for (int i = 0; i < rec.height; i++) {
+        v[i] = calloc(rec.width, sizeof(double));
+        if (!v[i]) exit(1);
+    }
+
+    // Normaliza a matriz rec
+    double media_rec = media_data(rec);
+    for (int a = 0; a < rec.height; a++) {
+        for (int b = 0; b < rec.width; b++) {
+            v[a][b] = (double)rec.Data[a][b] / media_rec;
+        }
+    }
+
+    // Percorre todas as possíveis posições na matriz src onde a matriz rec pode ser colocada
+    for (int i = 0; i < src.height - rec.height + 1; i++) {
+        for (int j = 0; j < src.width - rec.width + 1; j++) {
+            // Calcula a correlação cruzada entre as matrizes src e rec na posição (i, j)
+            double corr = correlacao_cruzada(src.Data, v, src.height, src.width, rec.height, rec.width, i, j);
+            if (corr > maior_corr) {
+                maior_corr = corr;
+                p[0] = i;
+                p[1] = j;
+            }
+        }
+    }
+
+    // Libera a memória alocada para a matriz v
+    for (int i = 0; i < rec.height; i++) {
+        free(v[i]);
+    }
+    free(v);
+
+    return p;
 }
