@@ -52,7 +52,8 @@ int main(int argc,char **argv){
     return 0;
 }
 
-//Algoritmo 1: Fazer N recortes aleatórios de tamanho L*M (E um ponteiro para cada posição?) com o filtro média.
+//Algoritmo 1: Fazer N recortes aleatórios de tamanho L*M com o filtro média.
+//Falta salvar em um arquivo.
 struct Image *alg1(struct Image *o,int n,int width,int height){
     int k = 0;
     int i=0,j=0;
@@ -122,9 +123,6 @@ unsigned char media(struct Image o,int x, int y){
     return m;
 }
 
-//Algoritmo 2: Procurar na imagem a posição de onde foi retirada e um ponteiro para ela.
-//Tem que retorna um vetor v = [x,y].
-
 double correlacao_cruzada(unsigned char **src, double **rec, int src_height, int src_width, int rec_height, int rec_width, int i, int j) {
     double soma = 0.0;
     double media_src = 0.0;
@@ -162,6 +160,9 @@ double correlacao_cruzada(unsigned char **src, double **rec, int src_height, int
     return soma;
 }
 
+//Algoritmo 2: Procurar na imagem a posição de onde foi retirada e um ponteiro para ela.
+//Tem que retorna um vetor v = [x,y].
+//Falta salvar as posições em um arquivo binário.
 int *alg2(struct Image src, struct Image rec) {
     int *p = NULL;
     double **v = NULL;
@@ -218,8 +219,6 @@ double media_data(struct Image o){
     media /= o.height*o.width;
     return media;
 }
-
-//Esperar Documento do Daniel.
 
 int gerar_matriz(struct Image *o){
     if(!(o->Data = (unsigned char **)calloc(o->height,sizeof(unsigned char*)))){

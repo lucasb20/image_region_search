@@ -19,9 +19,6 @@ struct Image filtro(struct Image o);
 unsigned char media(struct Image o,int x, int y);
 struct Image *alg1(struct Image *,int,int,int);
 int *alg2(struct Image src,struct Image rec);
-double quad(double x);
-double erro_mq(double *v,int tam);
-double modul(double x);
 double media_data(struct Image o);
 double correlacao_cruzada(unsigned char **src, double **rec, int src_height, int src_width, int rec_height, int rec_width, int i, int j);
 int *alg2_cor(struct Image src, struct Image rec);
@@ -310,19 +307,3 @@ int *alg2_cor(struct Image src, struct Image rec) {
     return p;
 }
  */
-/* double erro_mq(double *v,int tam){
-    double media = 0;
-    double res=0;
-    for(int i=0;i<tam;i++)media+=*(v+i);
-    media/=tam;
-    for(int i=0;i<tam;i++)res+=(quad(*(v+i)-media));
-    return res;
-}
-
-double quad(double x){
-    return x*x;
-}
-
-double modul(double x){
-    return (x>=0)?x:-x;
-} */
