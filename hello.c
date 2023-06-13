@@ -4,6 +4,7 @@
 #include <time.h>
 
 struct Image{
+    int tipo;
     int width;
     int height;
     int maxval;
@@ -11,8 +12,6 @@ struct Image{
 };
 
 int gerar_matriz(struct Image *o);
-void preencher(struct Image *o);
-void imprimir(struct Image o);
 void desalocar_matriz(struct Image *o);
 void copy_data(struct Image *,int,int, struct Image *);
 struct Image filtro(struct Image o);
@@ -111,6 +110,8 @@ struct Image filtro(struct Image o){
             img.Data[i][j] = media(aux,i+1,j+1);
         }
     }
+
+    desalocar_matriz(&aux);
 
     return img;
 }
@@ -231,24 +232,6 @@ int gerar_matriz(struct Image *o){
     }
 
     return 0;
-}
-
-void preencher(struct Image *o){
-    for(int i=0;i<o->height;i++){
-        for(int j=0;j<o->width;j++){    
-            *(*(o->Data+i)+j)=rand()%(o->maxval+1);
-        }
-    }
-}
-
-void imprimir(struct Image o){
-    for(int i=0;i<o.height;i++){
-        for(int j=0;j<o.width;j++){
-            printf("%3d ",*(*(o.Data+i)+j));
-        }
-        printf("\n");
-    }
-    printf("\n");
 }
 
 void desalocar_matriz(struct Image *o){

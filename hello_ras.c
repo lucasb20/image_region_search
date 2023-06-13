@@ -4,6 +4,7 @@
 #include <time.h>
 
 struct Image{
+    int tipo;
     int width;
     int height;
     int maxval;
@@ -18,7 +19,6 @@ void copy_data(struct Image *,int,int, struct Image *);
 struct Image filtro(struct Image o);
 unsigned char media(struct Image o,int x, int y);
 struct Image *alg1(struct Image *,int,int,int);
-int *alg2(struct Image src,struct Image rec);
 double media_data(struct Image o);
 double correlacao_cruzada(unsigned char **src, double **rec, int src_height, int src_width, int rec_height, int rec_width, int i, int j);
 int *alg2_cor(struct Image src, struct Image rec);
@@ -27,8 +27,8 @@ int main(int argc,char **argv){
     srand(time(NULL));
 
     struct Image foto;
-    foto.width = 1000;
-    foto.height = 1000;
+    foto.width = 10;
+    foto.height = 10;
     foto.maxval = 255;
 
     if(gerar_matriz(&foto)){
@@ -37,13 +37,7 @@ int main(int argc,char **argv){
     }
 
     preencher(&foto);
-    struct Image foto_f=filtro(foto);
-    struct Image *recorte;
-    recorte = alg1(&foto_f,1,100,100);
-
-    int *pos = alg2_cor(foto,*recorte);
-    printf("alg2 encontrou => x: %d, y: %d\n",*pos,*(pos+1));
-
+    
     return 0;
 }
 
@@ -106,6 +100,8 @@ struct Image filtro(struct Image o){
             img.Data[i][j] = media(aux,i+1,j+1);
         }
     }
+
+    desalocar_matriz(&aux);
 
     return img;
 }

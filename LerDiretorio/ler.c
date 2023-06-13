@@ -5,7 +5,7 @@
 #include <dirent.h>
 #include <stdio.h>
  
-int main(void)
+int main()
 {
     DIR *d;
     struct dirent *dir;
