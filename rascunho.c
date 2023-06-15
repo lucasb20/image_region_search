@@ -2,44 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
-
-struct Image{
-    int tipo;
-    int width;
-    int height;
-    int maxval;
-    unsigned char **Data;
-};
-
-int gerar_matriz(struct Image *o);
-void preencher(struct Image *o);
-void imprimir(struct Image o);
-void desalocar_matriz(struct Image *o);
-void copy_data(struct Image *,int,int, struct Image *);
-struct Image filtro(struct Image o);
-unsigned char media(struct Image o,int x, int y);
-struct Image *alg1(struct Image *,int,int,int);
-double media_data(struct Image o);
-double correlacao_cruzada(unsigned char **src, double **rec, int src_height, int src_width, int rec_height, int rec_width, int i, int j);
-int *alg2_cor(struct Image src, struct Image rec);
-
-int main(int argc,char **argv){
-    srand(time(NULL));
-
-    struct Image foto;
-    foto.width = 10;
-    foto.height = 10;
-    foto.maxval = 255;
-
-    if(gerar_matriz(&foto)){
-        puts("Faltou memória.");
-        exit(1);
-    }
-
-    preencher(&foto);
-    
-    return 0;
-}
+#include <lib/pmg.h>
 
 //Algoritmo 1: Fazer N recortes aleatórios de tamanho L*M (E um ponteiro para cada posição?) com o filtro média.
 struct Image *alg1(struct Image *o,int n,int width,int height){
@@ -206,7 +169,7 @@ double correlacao_cruzada(unsigned char **src, double **rec, int src_height, int
     return soma;
 }
 
-int *alg2_cor(struct Image src, struct Image rec) {
+int *alg2(struct Image src, struct Image rec) {
     int *p = NULL;
     double **v = NULL;
     double maior_corr = -INFINITY;

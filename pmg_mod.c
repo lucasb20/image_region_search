@@ -1,19 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "lib/pmg.h"
 
-struct Image {
-    int tipo;
-    int width;
-    int height;
-    int maxval;
-    unsigned char **Data;
-};
-
-void readPGMImage(struct Image *, char *);
-void viewPGMImage(struct Image *);
-void writePGMImage(struct Image *, char *);
-
-int main(int argc, char *argv[]) {
+/* int main(int argc, char *argv[]) {
 
     struct Image img;
 
@@ -30,7 +19,7 @@ int main(int argc, char *argv[]) {
 
     return 0;
 
-}
+} */
 
 void readPGMImage(struct Image *img, char *filename) {
 
