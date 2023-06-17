@@ -4,18 +4,29 @@
 #include "lib/funcs.h"
 #include "lib/pmg.h"
 
-//Algoritmo 1: Fazer N recortes aleatórios de tamanho L*M com o filtro média.
-//Falta salvar em um arquivo.
+//Algoritmo 1: Fazer N recortes aleatórios de tamanho L*M com o filtro média
 struct Image *alg1(struct Image *o,int n,int width,int height){
+    //Declaração de auxiliar para contagem de recortes e posições deles
     int k = 0;
     int i=0,j=0;
+    
+    //Criação da versão filtrada da imagem e alocação de *recortes
+    struct Image o_filt = filtro(*o);
     struct Image *recortes = calloc(n,sizeof(struct Image));
+    
+    //Percorre todos os recortes
     while(k<n){
-        i = (o->height == height)?0:rand()%(o->height-height);
-        j = (o->width == width)?0:rand()%(o->width-width);
+        //Gera posições aleatórias, essa condição é mais para depuração, saber que as dimensões estão corretas.
+        i = (o_filt.height == height)?0:rand()%(o_filt.height-height);
+        j = (o_filt.width == width)?0:rand()%(o_filt.width-width);
+        
+        //Definindo atributos
+        recortes[k].tipo = o->tipo;
         recortes[k].width = width;
         recortes[k].height = height;
-        recortes[k].maxval = o->maxval;
+        recortes[k].maxval = o_filt.maxval;
+
+        //Alocando o recorte[k]
         if(!(recortes[k].Data = (unsigned char **)calloc(recortes[k].height,sizeof(unsigned char*)))){
             printf("Faltou memória.");
             exit(1);
@@ -26,14 +37,18 @@ struct Image *alg1(struct Image *o,int n,int width,int height){
                 exit(1);      
             }
         }
-        copy_data(o,i,j,&recortes[k]);
+
+        //Copiando da matriz filtrada o recorte e colando no recortes[k]
+        copy_data(&o_filt,i,j,&recortes[k]);
         k++;
-        //Debugg
+
+        //Apenas debugg, lembrar de remover
         printf("pos [%d,%d].\n",i,j);
     }
     return recortes;
 }
 
+//Copia uma matriz e cola em outra na matriz na posição [x,y].
 void copy_data(struct Image *src,int x,int y, struct Image *des){
     int a=x,b=y;
     for(int i=0;i<des->height;i++){
@@ -46,8 +61,14 @@ void copy_data(struct Image *src,int x,int y, struct Image *des){
     }
 }
 
+//Função de retorna a Image filtrada da que foi passada por parâmetro
 struct Image filtro(struct Image o){
+
+    //img será a imagem filtrada, aux será apenas uma estrutura auxiliar para resolver problemas com bordas
     struct Image img,aux;
+
+    //Definindo img
+    img.tipo = o.tipo;
     img.height = o.height;
     img.width = o.width;
     img.maxval = o.maxval;
@@ -67,10 +88,9 @@ struct Image filtro(struct Image o){
         }
     }
 
+    //Definindo matriz auxiliar
     aux.height = o.height + 2;
     aux.width = o.height + 2;
-    aux.maxval = o.maxval;
-    
     if(!(aux.Data = (unsigned char **)calloc(aux.height,sizeof(unsigned char*)))){
             printf("Faltou memória.");
             exit(1);
@@ -82,12 +102,15 @@ struct Image filtro(struct Image o){
         }
     }
 
+    //Colocando o img na auxilar, deixando os espaços das bordas 0.
+    //Antes que possa surgir essa dúvida, o copy_data() dá erro de segmentação aqui, mas é um código tão pequeno que nem vale o trabalho de procurar o motivo.
     for(int i=0;i<img.height;i++){
         for(int j=0;j<img.width;j++){
             aux.Data[i+1][j+1] = img.Data[i][j];
         }
     }
 
+    //Definindo a img a partir da auxiliar, de forma que as bordas serão consideradas 0
     for(int i=0;i<img.height;i++){
         for(int j=0;j<img.width;j++){
             img.Data[i][j] = media(aux,i+1,j+1);
@@ -97,6 +120,7 @@ struct Image filtro(struct Image o){
     return img;
 }
 
+//Calcula a media dos elementos adjacentes a um Data[i][j] em uma struct Image.
 unsigned char media(struct Image o,int x, int y){
     unsigned char m;
 
@@ -142,8 +166,7 @@ double correlacao_cruzada(unsigned char **src, double **rec, int src_height, int
     return soma;
 }
 
-//Algoritmo 2: Procurar na imagem a posição de onde foi retirada e um ponteiro para ela.
-//Tem que retorna um vetor v = [x,y].
+//Algoritmo 2: Procurar na imagem a posição de onde foi retirada o recorte e um ponteiro para ela e retorna um vetor v = [x,y].
 int *alg2(struct Image src, struct Image rec) {
     int *p = NULL;
     double **v = NULL;
@@ -178,6 +201,7 @@ int *alg2(struct Image src, struct Image rec) {
                 p[1] = j;
             }
         }
+        //Apenas depuração, para conseguir olhar no terminal quantas etapas faltam para acabar
         printf("Demora: %d/%d\n",i,src.height - rec.height);
     }
 
@@ -190,6 +214,7 @@ int *alg2(struct Image src, struct Image rec) {
     return p;
 }
 
+//Retorna a media dos elementos de uma Data de uma struct Image.
 double media_data(struct Image o){
     double media=0;
     for(int i=0;i<o.height;i++){

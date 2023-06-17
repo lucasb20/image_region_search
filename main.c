@@ -1,5 +1,6 @@
 #include "lib/pmg.h"
 #include "lib/funcs.h"
+#include "lib/LerDire.h"
 
 //Remover isso aqui depois.
 /* #include <stdio.h>
@@ -11,24 +12,29 @@ int main(int argc,char **argv){
 /* 
     srand(time(NULL));
 
-    struct Image foto,foto_f;
+    struct Image foto;
     foto.tipo = 5;
-    foto.width = 1000;
-    foto.height = 1000;
+    foto.width = 20;
+    foto.height = 20;
     foto.maxval = 255;
     foto.Data = (unsigned char **)malloc(foto.height*sizeof(unsigned char *));
     for(int i=0;i<foto.height;i++)foto.Data[i]=(unsigned char *)calloc(foto.width,sizeof(unsigned char));
 
     for(int i=0;i<foto.height;i++)for(int j=0;j<foto.width;j++)foto.Data[i][j]=rand()%100+1;
 
-    foto_f = filtro(foto);
+    printf("Foto:\n");
+    viewPGMImage(foto);
 
-    struct Image *recorte = calloc(1,sizeof(struct Image));
+    int n=3;
 
-    recorte = alg1(&foto_f,1,200,200);
+    struct Image *recorte = calloc(n,sizeof(struct Image));
+    recorte = alg1(&foto,n,5,5);
 
-    printf("Recorte:\n");
-    viewPGMImage(*recorte);
+    for(int i=0;i<n;i++){
+        printf("Recorte n°%d\n",i);
+        viewPGMImage(*(recorte + i));
+    }
+
 
     int *p = (int *)calloc(2,sizeof(int));
 
