@@ -103,14 +103,14 @@ void writePGMImage(struct Image *img, char *filename) {
 
 }
 
-void viewPGMImage(struct Image *img) {
-    printf("Tipo: %d\n", img->tipo);
-    printf("Dimensões: [%d %d]\n", img->width, img->height);
-    printf("Max: %d\n", img->maxval);
+void viewPGMImage(struct Image img) {
+    printf("Tipo: %d\n", img.tipo);
+    printf("Dimensões: [%d %d]\n", img.width, img.height);
+    printf("Max: %d\n", img.maxval);
 
-    for (int i = 0; i < img->height; i++) {
-        for (int j = 0; j < img->width; j++) {
-            printf("%2hhu ", img->Data[i][j]);
+    for (int i = 0; i < img.height; i++) {
+        for (int j = 0; j < img.width; j++) {
+            printf("%3d ", img.Data[i][j]);
         }
         printf("\n");
     }
