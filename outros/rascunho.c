@@ -4,7 +4,6 @@
 #include <time.h>
 #include <lib/pmg.h>
 
-//Algoritmo 1: Fazer N recortes aleatórios de tamanho L*M (E um ponteiro para cada posição?) com o filtro média.
 struct Image *alg1(struct Image *o,int n,int width,int height){
     int k = 0;
     int i=0,j=0;
@@ -77,10 +76,6 @@ unsigned char media(struct Image o,int x, int y){
     return m;
 }
 
-//Algoritmo 2: Procurar na imagem a posição de onde foi retirada e um ponteiro para ela.
-
-//Tem que retorna um vetor v = [x,y].
-
 double media_data(struct Image o){
     double media=0;
     for(int i=0;i<o.height;i++){
@@ -91,8 +86,6 @@ double media_data(struct Image o){
     media /= o.height*o.width;
     return media;
 }
-
-//Esperar Documento do Daniel.
 
 int gerar_matriz(struct Image *o){
     if(!(o->Data = (unsigned char **)calloc(o->height,sizeof(unsigned char*)))){
@@ -330,7 +323,6 @@ int *alg2(struct Image src, struct Image rec) {
 //Depois eu ajeito isso, criar as funções.
 #define max(a,b) ((a) > (b) ? (a) : (b))
 #define min(a,b) ((a) < (b) ? (a) : (b))
-
 
 /* int *alg2(struct Image src,struct Image rec){
     int *p=NULL;

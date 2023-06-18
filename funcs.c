@@ -47,8 +47,13 @@ struct Image *alg1(struct Image *o,int n,int width,int height){
 
 //Algoritmo 2: Procurar na imagem a posição de onde foi retirada o recorte e um ponteiro para ela e retorna um vetor v = [x,y].
 int *alg2(struct Image src, struct Image rec) {
+    
+    //v aguardar a posição [x,y]
     int *p = NULL;
+
+    //v é uma matriz para guardar o recorte normalizado
     double **v = NULL;
+    //Definindo maior correlação para -infinito, já que tem que pegar a maior correlação, tem que inicializar na menor possível para ser substituida logo
     double maior_corr = -INFINITY;
 
     // Aloca memória para o array de inteiros p e a matriz v
@@ -61,7 +66,7 @@ int *alg2(struct Image src, struct Image rec) {
         if (!v[i]) exit(1);
     }
 
-    // Normaliza a matriz rec
+    // Normaliza a matriz rec e armazena em v
     double media_rec = media_data(rec);
     for (int a = 0; a < rec.height; a++) {
         for (int b = 0; b < rec.width; b++) {
@@ -81,6 +86,7 @@ int *alg2(struct Image src, struct Image rec) {
             }
         }
         //Apenas depuração, para conseguir olhar no terminal quantas etapas faltam para acabar
+        //Lembrar de remover isso
         printf("Demora: %d/%d\n",i,src.height - rec.height);
     }
 

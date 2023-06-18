@@ -2,25 +2,6 @@
 #include <stdlib.h>
 #include "lib/pmg.h"
 
-/* int main(int argc, char *argv[]) {
-
-    struct Image img;
-
-    if (argc != 3) {
-        printf("Formato: \n\t %s <imagemEntrada.pgm> <imagemSaida.pgm>\n", argv[0]);
-        exit(1);
-    }
-
-    readPGMImage(&img, argv[1]);
-
-    writePGMImage(&img, argv[2]);
-
-    viewPGMImage(&img);
-
-    return 0;
-
-} */
-
 void readPGMImage(struct Image *img, char *filename) {
 
     FILE *fp;
