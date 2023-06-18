@@ -5,6 +5,7 @@
 #include "lib/pmg.h"
 
 //Algoritmo 1: Fazer N subimagens de tamanho width x height com o filtro média
+//Falta: Parâmetro para receber imagem PMG fornecida pelo usuário, salvar em um diretório fornecido pelo usuário.
 struct Image *alg1(struct Image *o,int n,int width,int height){
     //Declaração de auxiliar para contagem de recortes e posições deles
     int k = 0;
@@ -41,11 +42,13 @@ struct Image *alg1(struct Image *o,int n,int width,int height){
         //Copiando da matriz filtrada o recorte e colando no recortes[k]
         copy_data(&o_filt,i,j,&recortes[k]);
         k++;
+        //writePGMImage(recortes+k,"nome");
     }
     return recortes;
 }
 
 //Algoritmo 2: Procurar na imagem a posição de onde foi retirada o recorte e um ponteiro para ela e retorna um vetor v = [x,y].
+//Falta: Parâmetro para receber diretório onde buscar os recortes e a imagem I, reportar tempo total para terminar o processo todo, salvar em um arquivo de texto as coordenadas com "nome,x,y\n"
 int *alg2(struct Image src, struct Image rec) {
     
     //v aguardar a posição [x,y]
