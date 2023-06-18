@@ -3,13 +3,13 @@
 #include "lib/LerDire.h"
 
 //Remover isso aqui depois.
-/* #include <stdio.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
- */
+
 int main(int argc,char **argv){
     //Apenas depuração.
-/* 
+
     srand(time(NULL));
 
     struct Image foto;
@@ -41,6 +41,6 @@ int main(int argc,char **argv){
     p = alg2(foto,*recorte);
 
     printf("Algoritmo encontrou: [%d,%d]\n",*p,*(p+1));
- */
+
     return 0;
 }

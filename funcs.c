@@ -4,7 +4,7 @@
 #include "lib/funcs.h"
 #include "lib/pmg.h"
 
-//Algoritmo 1: Fazer N recortes aleatórios de tamanho L*M com o filtro média
+//Algoritmo 1: Fazer N subimagens de tamanho width x height com o filtro média
 struct Image *alg1(struct Image *o,int n,int width,int height){
     //Declaração de auxiliar para contagem de recortes e posições deles
     int k = 0;
@@ -17,8 +17,8 @@ struct Image *alg1(struct Image *o,int n,int width,int height){
     //Percorre todos os recortes
     while(k<n){
         //Gera posições aleatórias, essa condição é mais para depuração, saber que as dimensões estão corretas.
-        i = (o_filt.height == height)?0:rand()%(o_filt.height-height);
-        j = (o_filt.width == width)?0:rand()%(o_filt.width-width);
+        i = (o_filt.height <= height)?0:rand()%(o_filt.height-height);
+        j = (o_filt.width <= width)?0:rand()%(o_filt.width-width);
         
         //Definindo atributos
         recortes[k].tipo = o->tipo;
@@ -41,14 +41,59 @@ struct Image *alg1(struct Image *o,int n,int width,int height){
         //Copiando da matriz filtrada o recorte e colando no recortes[k]
         copy_data(&o_filt,i,j,&recortes[k]);
         k++;
-
-        //Apenas debugg, lembrar de remover
-        printf("pos [%d,%d].\n",i,j);
     }
     return recortes;
 }
 
-//Copia uma matriz e cola em outra na matriz na posição [x,y].
+//Algoritmo 2: Procurar na imagem a posição de onde foi retirada o recorte e um ponteiro para ela e retorna um vetor v = [x,y].
+int *alg2(struct Image src, struct Image rec) {
+    int *p = NULL;
+    double **v = NULL;
+    double maior_corr = -INFINITY;
+
+    // Aloca memória para o array de inteiros p e a matriz v
+    p = calloc(2, sizeof(int));
+    if (!p) exit(1);
+    v = calloc(rec.height, sizeof(double *));
+    if (!v) exit(1);
+    for (int i = 0; i < rec.height; i++) {
+        v[i] = calloc(rec.width, sizeof(double));
+        if (!v[i]) exit(1);
+    }
+
+    // Normaliza a matriz rec
+    double media_rec = media_data(rec);
+    for (int a = 0; a < rec.height; a++) {
+        for (int b = 0; b < rec.width; b++) {
+            v[a][b] = (double)rec.Data[a][b] / media_rec;
+        }
+    }
+
+    // Percorre todas as possíveis posições na matriz src onde a matriz rec pode ser colocada
+    for (int i = 0; i < src.height - rec.height + 1; i++) {
+        for (int j = 0; j < src.width - rec.width + 1; j++) {
+            // Calcula a correlação cruzada entre as matrizes src e rec na posição (i, j)
+            double corr = correlacao_cruzada(src.Data, v, src.height, src.width, rec.height, rec.width, i, j);
+            if (corr > maior_corr) {
+                maior_corr = corr;
+                p[0] = i;
+                p[1] = j;
+            }
+        }
+        //Apenas depuração, para conseguir olhar no terminal quantas etapas faltam para acabar
+        printf("Demora: %d/%d\n",i,src.height - rec.height);
+    }
+
+    // Libera a memória alocada para a matriz v
+    for (int i = 0; i < rec.height; i++) {
+        free(v[i]);
+    }
+    free(v);
+
+    return p;
+}
+
+//Copia os elementos de uma matriz src começando na posição [x,y] e cola em uma matriz des até completar ela.
 void copy_data(struct Image *src,int x,int y, struct Image *des){
     int a=x,b=y;
     for(int i=0;i<des->height;i++){
@@ -103,7 +148,6 @@ struct Image filtro(struct Image o){
     }
 
     //Colocando o img na auxilar, deixando os espaços das bordas 0.
-    //Antes que possa surgir essa dúvida, o copy_data() dá erro de segmentação aqui, mas é um código tão pequeno que nem vale o trabalho de procurar o motivo.
     for(int i=0;i<img.height;i++){
         for(int j=0;j<img.width;j++){
             aux.Data[i+1][j+1] = img.Data[i][j];
@@ -129,6 +173,7 @@ unsigned char media(struct Image o,int x, int y){
     return m;
 }
 
+//Método de similação
 double correlacao_cruzada(unsigned char **src, double **rec, int src_height, int src_width, int rec_height, int rec_width, int i, int j) {
     double soma = 0.0;
     double media_src = 0.0;
@@ -166,53 +211,6 @@ double correlacao_cruzada(unsigned char **src, double **rec, int src_height, int
     return soma;
 }
 
-//Algoritmo 2: Procurar na imagem a posição de onde foi retirada o recorte e um ponteiro para ela e retorna um vetor v = [x,y].
-int *alg2(struct Image src, struct Image rec) {
-    int *p = NULL;
-    double **v = NULL;
-    double maior_corr = -INFINITY;
-
-    // Aloca memória para o array de inteiros p e a matriz v
-    p = calloc(2, sizeof(int));
-    if (!p) exit(1);
-    v = calloc(rec.height, sizeof(double *));
-    if (!v) exit(1);
-    for (int i = 0; i < rec.height; i++) {
-        v[i] = calloc(rec.width, sizeof(double));
-        if (!v[i]) exit(1);
-    }
-
-    // Normaliza a matriz rec
-    double media_rec = media_data(rec);
-    for (int a = 0; a < rec.height; a++) {
-        for (int b = 0; b < rec.width; b++) {
-            v[a][b] = (double)rec.Data[a][b] / media_rec;
-        }
-    }
-
-    // Percorre todas as possíveis posições na matriz src onde a matriz rec pode ser colocada
-    for (int i = 0; i < src.height - rec.height + 1; i++) {
-        for (int j = 0; j < src.width - rec.width + 1; j++) {
-            // Calcula a correlação cruzada entre as matrizes src e rec na posição (i, j)
-            double corr = correlacao_cruzada(src.Data, v, src.height, src.width, rec.height, rec.width, i, j);
-            if (corr > maior_corr) {
-                maior_corr = corr;
-                p[0] = i;
-                p[1] = j;
-            }
-        }
-        //Apenas depuração, para conseguir olhar no terminal quantas etapas faltam para acabar
-        printf("Demora: %d/%d\n",i,src.height - rec.height);
-    }
-
-    // Libera a memória alocada para a matriz v
-    for (int i = 0; i < rec.height; i++) {
-        free(v[i]);
-    }
-    free(v);
-
-    return p;
-}
 
 //Retorna a media dos elementos de uma Data de uma struct Image.
 double media_data(struct Image o){
