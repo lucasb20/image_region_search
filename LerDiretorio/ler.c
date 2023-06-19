@@ -5,7 +5,7 @@
 #include <dirent.h>
 #include <stdio.h>
  
-int main()
+/* int main()
 {
     DIR *d;
     struct dirent *dir;
@@ -25,4 +25,4 @@ int main()
         closedir(d);
     }
     return(0);
-}		
+}		 */

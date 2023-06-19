@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <dirent.h>
 #include "lib/funcs.h"
 #include "lib/pmg.h"
 
@@ -42,7 +43,21 @@ struct Image *alg1(struct Image *o,int n,int width,int height){
         //Copiando da matriz filtrada o recorte e colando no recortes[k]
         copy_data(&o_filt,i,j,&recortes[k]);
         k++;
-        //writePGMImage(recortes+k,"nome");
+
+        //Salvando os recortes para a pasta. (Não funcional ainda)
+        //DIR *d;
+        //struct dirent *arq;
+        //d = opendir("./images");
+    /*  if(d){
+            while((dir = readdir(d)) != NULL){
+                writePGMImage(recortes+k,"nome");
+        }
+        else{
+            printf("Erro.\n");
+            exit(1);
+        }
+        closedir(d);
+    } */
     }
     return recortes;
 }
