@@ -6,12 +6,15 @@
 #include "lib/pmg.h"
 
 //Algoritmo 1: Fazer N subimagens de tamanho width x height com o filtro média
-//Falta: Parâmetro para receber imagem PMG fornecida pelo usuário, salvar em um diretório fornecido pelo usuário.
-struct Image *alg1(struct Image *o,int n,int width,int height){
+void alg1(char *imagem, char *diretorio,int n,int width,int height){
     //Declaração de auxiliar para contagem de recortes e posições deles
     int k = 0;
     int i=0,j=0;
     
+    //Criando uma estrutura para armazenar a imagem em que será coletado subimagens
+    struct Image *o = malloc(sizeof(struct Image));
+    readPGMImage(o,imagem);
+
     //Criação da versão filtrada da imagem e alocação de *recortes
     struct Image o_filt = filtro(*o);
     struct Image *recortes = calloc(n,sizeof(struct Image));
@@ -43,23 +46,14 @@ struct Image *alg1(struct Image *o,int n,int width,int height){
         //Copiando da matriz filtrada o recorte e colando no recortes[k]
         copy_data(&o_filt,i,j,&recortes[k]);
         k++;
-
-        //Salvando os recortes para a pasta. (Não funcional ainda)
-        //DIR *d;
-        //struct dirent *arq;
-        //d = opendir("./images");
-    /*  if(d){
-            while((dir = readdir(d)) != NULL){
-                writePGMImage(recortes+k,"nome");
-        }
-        else{
-            printf("Erro.\n");
-            exit(1);
-        }
-        closedir(d);
-    } */
     }
-    return recortes;
+
+    //Salvando os recortes para a pasta.
+    for(int z=0;z<n;z++){
+        char nome[100];
+        sprintf(nome,"%s/subimagem%d.pgm",diretorio,i);
+        writePGMImage(recortes+z,nome);
+    }
 }
 
 //Algoritmo 2: Procurar na imagem a posição de onde foi retirada o recorte e um ponteiro para ela e retorna um vetor v = [x,y].

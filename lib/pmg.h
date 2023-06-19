@@ -10,7 +10,7 @@ struct Image {
 };
 
 void readPGMImage(struct Image *, char *);
-void viewPGMImage(struct Image );
+void viewPGMImage(struct Image *);
 void writePGMImage(struct Image *, char *);
 
 #endif
