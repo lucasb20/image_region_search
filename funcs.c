@@ -5,7 +5,7 @@
 #include "lib/funcs.h"
 #include "lib/pmg.h"
 
-//Algoritmo 1: Fazer N subimagens de tamanho width x height com o filtro média
+//Algoritmo 1: Será dado uma Imagem, e será dado um diretório para salvar N subimagens de tamanho width x height com o filtro média
 void alg1(char *imagem, char *diretorio,int n,int width,int height){
     //Declaração de auxiliar para contagem de recortes e posições deles
     int k = 0;
@@ -56,17 +56,24 @@ void alg1(char *imagem, char *diretorio,int n,int width,int height){
     }
 }
 
-//Algoritmo 2: Procurar na imagem a posição de onde foi retirada o recorte e um ponteiro para ela e retorna um vetor v = [x,y].
-//Falta: Parâmetro para receber diretório onde buscar os recortes e a imagem I, reportar tempo total para terminar o processo todo, salvar em um arquivo de texto as coordenadas com "nome,x,y\n"
-int *alg2(struct Image src, struct Image rec) {
-    
-    //v aguardar a posição [x,y]
-    int *p = NULL;
+//Algoritmo 2: Recebe uma imagem, e recebe um diretório onde haverão subimagens, será verificado de onde cada uma foi retirada na imagem e imprimirá a posição superior esquerda em um arquivo.
+void alg2(char *imagem, char *diretorio){
 
+    struct Image src;
+    readPGMImage(&src,imagem);
+
+    struct Image rec;
+
+    //p guarda a posição [x,y]
+    int *p = NULL;
     //v é uma matriz para guardar o recorte normalizado
     double **v = NULL;
     //Definindo maior correlação para -infinito, já que tem que pegar a maior correlação, tem que inicializar na menor possível para ser substituida logo
     double maior_corr = -INFINITY;
+
+    //Declarando ponteiro para a pasta.
+    DIR *d;
+    struct dirent *dir;
 
     // Aloca memória para o array de inteiros p e a matriz v
     p = calloc(2, sizeof(int));
@@ -78,28 +85,58 @@ int *alg2(struct Image src, struct Image rec) {
         if (!v[i]) exit(1);
     }
 
-    // Normaliza a matriz rec e armazena em v
-    double media_rec = media_data(rec);
-    for (int a = 0; a < rec.height; a++) {
-        for (int b = 0; b < rec.width; b++) {
-            v[a][b] = (double)rec.Data[a][b] / media_rec;
-        }
+    //Lendo cada imagem do diretório e salvando cada posição
+    d = opendir(diretorio);
+
+    FILE *file_ptr = fopen("alg2.txt","w");
+
+    if(!(file_ptr)){
+        puts("ERRO.");
+        exit(1);
     }
 
-    // Percorre todas as possíveis posições na matriz src onde a matriz rec pode ser colocada
-    for (int i = 0; i < src.height - rec.height + 1; i++) {
-        for (int j = 0; j < src.width - rec.width + 1; j++) {
-            // Calcula a correlação cruzada entre as matrizes src e rec na posição (i, j)
-            double corr = correlacao_cruzada(src.Data, v, src.height, src.width, rec.height, rec.width, i, j);
-            if (corr > maior_corr) {
-                maior_corr = corr;
-                p[0] = i;
-                p[1] = j;
+    if(d)
+    {
+        while ((dir = readdir(d)) != NULL)
+        {
+            //Evitando de resultados anteriores influênciarem
+            maior_corr = -INFINITY;
+
+            //printf("%s\n", dir->d_name);
+            readPGMImage(&rec,dir->d_name);
+
+            // Normaliza a matriz rec e armazena em v
+            double media_rec = media_data(rec);
+            for (int a = 0; a < rec.height; a++) {
+                for (int b = 0; b < rec.width; b++) {
+                    v[a][b] = (double)rec.Data[a][b] / media_rec;
+                }
             }
+
+            // Percorre todas as possíveis posições na matriz src onde a matriz rec pode ser colocada
+            for (int i = 0; i < src.height - rec.height + 1; i++) {
+                for (int j = 0; j < src.width - rec.width + 1; j++) {
+                    // Calcula a correlação cruzada entre as matrizes src e rec na posição (i, j)
+                    double corr = correlacao_cruzada(src.Data, v, src.height, src.width, rec.height, rec.width, i, j);
+                    if (corr > maior_corr) {
+                        maior_corr = corr;
+                        p[0] = i;
+                        p[1] = j;
+                    }
+                }
+                //Apenas depuração, para conseguir olhar no terminal quantas etapas faltam para acabar
+                //Lembrar de remover isso
+                //printf("Demora: %d/%d\n",i,src.height - rec.height);
+            }
+
+            fprintf(file_ptr,"%s, %d, %d\n",dir->d_name,p[0],p[1]);
         }
-        //Apenas depuração, para conseguir olhar no terminal quantas etapas faltam para acabar
-        //Lembrar de remover isso
-        printf("Demora: %d/%d\n",i,src.height - rec.height);
+        fclose(file_ptr);
+        closedir(d);
+    }
+    else{
+        printf("Erro ao abrir o diretório '%s'.\n",diretorio);
+        exit(1);
     }
 
     // Libera a memória alocada para a matriz v
@@ -107,8 +144,6 @@ int *alg2(struct Image src, struct Image rec) {
         free(v[i]);
     }
     free(v);
-
-    return p;
 }
 
 //Copia os elementos de uma matriz src começando na posição [x,y] e cola em uma matriz des até completar ela.
