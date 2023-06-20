@@ -51,7 +51,7 @@ void alg1(char *imagem, char *diretorio,int n,int width,int height){
     //Salvando os recortes para a pasta.
     for(int z=0;z<n;z++){
         char nome[100];
-        sprintf(nome,"%s/subimagem%d.pgm",diretorio,i);
+        sprintf(nome,"%s/subimagem%d.pgm",diretorio,z);
         writePGMImage(recortes+z,nome);
     }
 }
