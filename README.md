@@ -1,13 +1,16 @@
-# Trabalho Final de Laboratório de Programação
+# Projeto: Busca de Regiões em Imagens
 
 # Integrantes:
 - Lucas Rocha
 - Aldair Ryan
 
-# Projeto: Busca de Regiões em Imagens
-Inclui dois algoritmos, um que salvar subimagens borradas (recortes) a partir de uma imagem, e outro que salva onde a posição de onde foi retirado a subimagem borrada a partir da imagem.
+# Trabalho final da Laboratório de Programação
 
-# Etapas do projeto
+Projeto iniciando como trabalho final da cadeira de Laboratório de Programação, pelo professor Daniel Ferreira no curso de Ciências da Computação.
+
+Inclui dois algoritmos principais. O alg1 salva n subimagens borradas (que chamei várias vazes de recortes), de tamanho width x height, em um diretório a partir de uma imagem. O alg2 recebe uma imagem e um diretório com subimagens, e salva em um arquivo o nome de cada subimagem ao lado da localização de onde ela foi identificada na imagem, especificamente a coordenada da imagem que equivale do que equivale pixel superior esquerdo da subimagem, calculado por correlação cruzada.
+
+# Arquivos do projeto
 
 ### Main
 
@@ -24,10 +27,6 @@ Inclui dois algoritmos, um que salvar subimagens borradas (recortes) a partir de
 #elif _WIN32
   fseek(fp,0, SEEK_CUR);
 #endif
-
-### LER DIRETÓRIOS E TEMPO
-
-//Código do ler.c e ttime.c
 
 ### FUNÇÕES
 
