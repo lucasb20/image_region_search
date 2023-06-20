@@ -8,7 +8,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "lib/pmg.h"
+#include "lib/pgm.h"
 #include "lib/funcs.h"
 
 int main(int argc,char **argv){
@@ -20,9 +20,14 @@ int main(int argc,char **argv){
     char *imagem = *(argv+1);
     char *diretory = *(argv+2);
 
-    printf("Imagem detectada: %s, diretório detectado: %s.\n",imagem,diretory);
+/*     int n;
 
-    alg1(imagem,diretory,5,2,3);
+    puts("Digite uma quantidade de recortes.");
+    scanf("%d",&n);
+
+    alg1(imagem,diretory,n,10,10);
+ */
+    alg2(imagem,diretory);
 
     return 0;
 }

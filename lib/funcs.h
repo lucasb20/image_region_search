@@ -1,4 +1,12 @@
-#include "pmg.h"
+/* 
+    Aluno : Lucas da Rocha Barbosa / Aldair Ryan Fernandes Mendes
+    Matricula : *** / ***
+    Avaliacao 04 : Trabalho Final
+    04.505.23−2023.1 − Prof.Daniel Ferreira
+    Compilador : GCC versão 11.3.0
+ */
+
+#include "pgm.h"
 
 void copy_data(struct Image *,int,int, struct Image *);
 struct Image filtro(struct Image);

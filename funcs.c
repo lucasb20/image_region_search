@@ -1,9 +1,18 @@
+/* 
+    Aluno : Lucas da Rocha Barbosa / Aldair Ryan Fernandes Mendes
+    Matricula : *** / ***
+    Avaliacao 04 : Trabalho Final
+    04.505.23−2023.1 − Prof.Daniel Ferreira
+    Compilador : GCC versão 11.3.0
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <dirent.h>
+#include <string.h>
 #include "lib/funcs.h"
-#include "lib/pmg.h"
+#include "lib/pgm.h"
 
 //Algoritmo 1: Será dado uma Imagem, e será dado um diretório para salvar N subimagens de tamanho width x height com o filtro média
 void alg1(char *imagem, char *diretorio,int n,int width,int height){
@@ -71,18 +80,18 @@ void alg2(char *imagem, char *diretorio){
     //Definindo maior correlação para -infinito, já que tem que pegar a maior correlação, tem que inicializar na menor possível para ser substituida logo
     double maior_corr = -INFINITY;
 
+    //Como todas as imagens são do mesmo tamanho, isso aqui é para garantir que o 'v' só receba as dimensões da primeira imagem
+    char first_rec = 1;
+
     //Declarando ponteiro para a pasta.
     DIR *d;
     struct dirent *dir;
 
     // Aloca memória para o array de inteiros p e a matriz v
     p = calloc(2, sizeof(int));
-    if (!p) exit(1);
-    v = calloc(rec.height, sizeof(double *));
-    if (!v) exit(1);
-    for (int i = 0; i < rec.height; i++) {
-        v[i] = calloc(rec.width, sizeof(double));
-        if (!v[i]) exit(1);
+    if (!p){
+        printf("Falta de memória.\n");
+        exit(1);
     }
 
     //Lendo cada imagem do diretório e salvando cada posição
@@ -99,11 +108,36 @@ void alg2(char *imagem, char *diretorio){
     {
         while ((dir = readdir(d)) != NULL)
         {
+            //Eu não sei o porquê, mas dentro de todo diretório existe um arquivo '.' e '..'.
+            //Essa confição pula a leitura desses arquivos não .pgm.
+            if (strcmp(dir->d_name, ".") == 0 || strcmp(dir->d_name, "..") == 0) {
+                continue;
+            }
+            
             //Evitando de resultados anteriores influênciarem
             maior_corr = -INFINITY;
 
-            //printf("%s\n", dir->d_name);
-            readPGMImage(&rec,dir->d_name);
+            //Nome do arquivo no diretório e passando para struct Image do recorte
+            char nome[400];
+            sprintf(nome,"%s/%s",diretorio,dir->d_name);
+            readPGMImage(&rec,nome);
+
+            //Como é garantido que as imagens seguem as dimensões da primeira imagem, só basta realizar alocação uma vez com essa condição
+            if(first_rec){
+                v = calloc(rec.height, sizeof(double *));
+                if (!v){
+                    printf("Falta de memória.\n");
+                    exit(1);
+                }
+                for (int i = 0; i < rec.height; i++) {
+                    v[i] = calloc(rec.width, sizeof(double));
+                    if (!v[i]){
+                    printf("Falta de memória.\n");
+                    exit(1);
+                    }
+                }
+                first_rec = 0;
+            }
 
             // Normaliza a matriz rec e armazena em v
             double media_rec = media_data(rec);
@@ -124,11 +158,12 @@ void alg2(char *imagem, char *diretorio){
                         p[1] = j;
                     }
                 }
+
                 //Apenas depuração, para conseguir olhar no terminal quantas etapas faltam para acabar
                 //Lembrar de remover isso
                 //printf("Demora: %d/%d\n",i,src.height - rec.height);
             }
-
+            
             fprintf(file_ptr,"%s, %d, %d\n",dir->d_name,p[0],p[1]);
         }
         fclose(file_ptr);
@@ -138,7 +173,7 @@ void alg2(char *imagem, char *diretorio){
         printf("Erro ao abrir o diretório '%s'.\n",diretorio);
         exit(1);
     }
-
+    
     // Libera a memória alocada para a matriz v
     for (int i = 0; i < rec.height; i++) {
         free(v[i]);
