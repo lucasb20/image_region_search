@@ -27,7 +27,11 @@ void readPGMImage(struct Image *img, char *filename) {
 
     img->tipo = getc(fp) - 48;
 
-    fseek(fp, 1, SEEK_CUR);
+    #ifdef __linux__
+    fseek(fp,1, SEEK_CUR);
+    #elif _WIN32
+    fseek(fp,0, SEEK_CUR);
+    #endif
 
     while ((ch = getc(fp)) == '#') {
         while ((ch = getc(fp)) != '\n');
