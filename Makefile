@@ -14,3 +14,6 @@ funcs.o: funcs.c
 
 clean:
 	rm -f *.o hello.e
+
+cleanwin:
+	del *.o hello.e

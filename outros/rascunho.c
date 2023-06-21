@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
-#include <lib/pmg.h>
+#include <lib/pgm.h>
 
 struct Image *alg1(struct Image *o,int n,int width,int height){
     int k = 0;
@@ -324,7 +324,7 @@ int *alg2(struct Image src, struct Image rec) {
 #define max(a,b) ((a) > (b) ? (a) : (b))
 #define min(a,b) ((a) < (b) ? (a) : (b))
 
-/* int *alg2(struct Image src,struct Image rec){
+int *alg2(struct Image src,struct Image rec){
     int *p=NULL;
 
     double *v;
@@ -374,4 +374,3 @@ int *alg2(struct Image src, struct Image rec) {
 
     return p;
 }
- */

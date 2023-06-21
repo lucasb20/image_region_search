@@ -1,11 +1,3 @@
-/* 
-    Aluno : Lucas da Rocha Barbosa / Aldair Ryan Fernandes Mendes
-    Matricula : *** / ***
-    Avaliacao 04 : Trabalho Final
-    04.505.23−2023.1 − Prof.Daniel Ferreira
-    Compilador : GCC versão 11.3.0
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -31,8 +23,8 @@ void alg1(char *imagem, char *diretorio,int n,int width,int height){
     //Percorre todos os recortes
     while(k<n){
         //Gera posições aleatórias, essa condição é mais para depuração, saber que as dimensões estão corretas.
-        i = (o_filt.height <= height)?0:rand()%(o_filt.height-height);
-        j = (o_filt.width <= width)?0:rand()%(o_filt.width-width);
+        i = rand()%(o_filt.height-height);
+        j = rand()%(o_filt.width-width);
         
         //Definindo atributos
         recortes[k].tipo = o->tipo;
@@ -158,10 +150,6 @@ void alg2(char *imagem, char *diretorio){
                         p[1] = j;
                     }
                 }
-
-                //Apenas depuração, para conseguir olhar no terminal quantas etapas faltam para acabar
-                //Lembrar de remover isso
-                //printf("Demora: %d/%d\n",i,src.height - rec.height);
             }
             
             fprintf(file_ptr,"%s, %d, %d\n",dir->d_name,p[0],p[1]);
