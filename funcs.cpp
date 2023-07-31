@@ -7,18 +7,18 @@
 #include "lib/pgm.h"
 
 //Algoritmo 1: Será dado uma Imagem, e será dado um diretório para salvar N subimagens de tamanho width x height com o filtro média
-void alg1(char *imagem, char *diretorio,int n,int width,int height){
+void alg1(const char *imagem, const char *diretorio,int n,int width,int height){
     //Declaração de auxiliar para contagem de recortes e posições deles
     int k = 0;
     int i=0,j=0;
     
     //Criando uma estrutura para armazenar a imagem em que será coletado subimagens
-    struct Image *o = malloc(sizeof(struct Image));
+    struct Image *o = (struct Image *) malloc(sizeof(struct Image));
     readPGMImage(o,imagem);
 
     //Criação da versão filtrada da imagem e alocação de *recortes
     struct Image o_filt = filtro(*o);
-    struct Image *recortes = calloc(n,sizeof(struct Image));
+    struct Image *recortes = (struct Image *) calloc(n,sizeof(struct Image));
     
     //Percorre todos os recortes
     while(k<n){
@@ -58,7 +58,7 @@ void alg1(char *imagem, char *diretorio,int n,int width,int height){
 }
 
 //Algoritmo 2: Recebe uma imagem, e recebe um diretório onde haverão subimagens, será verificado de onde cada uma foi retirada na imagem e imprimirá a posição superior esquerda em um arquivo.
-void alg2(char *imagem, char *diretorio){
+void alg2(const char *imagem, const char *diretorio){
 
     struct Image src;
     readPGMImage(&src,imagem);
@@ -80,7 +80,7 @@ void alg2(char *imagem, char *diretorio){
     struct dirent *dir;
 
     // Aloca memória para o array de inteiros p e a matriz v
-    p = calloc(2, sizeof(int));
+    p = (int *) calloc(2, sizeof(int));
     if (!p){
         printf("Falta de memória.\n");
         exit(1);
@@ -116,13 +116,13 @@ void alg2(char *imagem, char *diretorio){
 
             //Como é garantido que as imagens seguem as dimensões da primeira imagem, só basta realizar alocação uma vez com essa condição
             if(first_rec){
-                v = calloc(rec.height, sizeof(double *));
+                v = (double**) calloc(rec.height, sizeof(double *));
                 if (!v){
                     printf("Falta de memória.\n");
                     exit(1);
                 }
                 for (int i = 0; i < rec.height; i++) {
-                    v[i] = calloc(rec.width, sizeof(double));
+                    v[i] = (double *) calloc(rec.width, sizeof(double));
                     if (!v[i]){
                     printf("Falta de memória.\n");
                     exit(1);

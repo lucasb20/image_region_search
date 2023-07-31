@@ -1,9 +1,9 @@
-CC = gcc
-CFLAGS = -Wall -Wextra -Wpedantic -std=c99
+CC = g++
+CFLAGS = -Wall -Wextra -Wpedantic -std=c++17
 LDFLAGS = -lm
 
-SRCS = main.c pgm.c funcs.c
-OBJS = $(SRCS:.c=.o)
+SRCS = main.cpp pgm.cpp funcs.cpp
+OBJS = $(SRCS:.cpp=.o)
 TARGET = hello
 
 .PHONY: all clean DEBUG_MODE
@@ -13,7 +13,7 @@ all: $(TARGET)
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $(TARGET) $(LDFLAGS)
 
-%.o: %.c
+%.o: %.cpp
 	$(CC) $(CFLAGS) -c $< -o $@
 
 DEBUG_MODE: CFLAGS += -g

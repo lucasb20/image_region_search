@@ -9,8 +9,8 @@ struct Image {
     unsigned char **Data;
 };
 
-void readPGMImage(struct Image *, char *);
+void readPGMImage(struct Image *, const char *);
 void viewPGMImage(struct Image *);
-void writePGMImage(struct Image *, char *);
+void writePGMImage(struct Image *, const char *);
 
 #endif

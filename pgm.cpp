@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "lib/pgm.h"
 
-void readPGMImage(struct Image *img, char *filename) {
+void readPGMImage(struct Image *img, const char *filename) {
 
     FILE *fp;
     char ch;
@@ -67,7 +67,7 @@ void readPGMImage(struct Image *img, char *filename) {
 
 }
 
-void writePGMImage(struct Image *img, char *filename) {
+void writePGMImage(struct Image *img, const char *filename) {
     FILE *fp;
 
     if (!(fp = fopen(filename, "wb"))) {
