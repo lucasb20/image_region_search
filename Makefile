@@ -6,9 +6,11 @@ SRCS = main.cpp pgm.cpp funcs.cpp
 OBJS = $(SRCS:.cpp=.o)
 TARGET = hello
 
-.PHONY: all clean DEBUG_MODE
+main.o: main.c
+	gcc -o main.o -c main.c
 
-all: $(TARGET)
+pmg.o: pgm.c
+	gcc -o pgm.o -c pgm.c
 
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $(TARGET) $(LDFLAGS)
@@ -20,4 +22,7 @@ DEBUG_MODE: CFLAGS += -g
 DEBUG_MODE: all
 
 clean:
-	rm -f $(OBJS) $(TARGET)
+	rm -f *.o hello.e
+
+cleanwin:
+	del *.o hello.e
