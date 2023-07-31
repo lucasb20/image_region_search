@@ -1,0 +1,13 @@
+# Arquivos de compilação
+*.o
+*.out
+
+# Arquivos de configuração
+config.ini
+
+# Arquivos temporários
+*.tmp
+*.pgm
+
+# Saída
+hello

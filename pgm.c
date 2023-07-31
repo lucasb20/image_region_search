@@ -69,7 +69,6 @@ void readPGMImage(struct Image *img, char *filename) {
 
 void writePGMImage(struct Image *img, char *filename) {
     FILE *fp;
-    char ch;
 
     if (!(fp = fopen(filename, "wb"))) {
         perror("Erro.");

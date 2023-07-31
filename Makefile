@@ -1,19 +1,23 @@
-all: hello.e
+CC = gcc
+CFLAGS = -Wall -Wextra -Wpedantic -std=c99
+LDFLAGS = -lm
 
-hello.e: pgm.o main.o funcs.o
-	gcc -o hello.e main.o pgm.o funcs.o -lm
+SRCS = main.c pgm.c funcs.c
+OBJS = $(SRCS:.c=.o)
+TARGET = hello
 
-main.o: main.c
-	gcc -o main.o -c main.c
+.PHONY: all clean DEBUG_MODE
 
-pmg.o: pgm.c
-	gcc -o pgm.o -c pgm.c
+all: $(TARGET)
 
-funcs.o: funcs.c
-	gcc -o funcs.o -c funcs.c
+$(TARGET): $(OBJS)
+	$(CC) $(CFLAGS) $(OBJS) -o $(TARGET) $(LDFLAGS)
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+DEBUG_MODE: CFLAGS += -g
+DEBUG_MODE: all
 
 clean:
-	rm -f *.o hello.e
-
-cleanwin:
-	del *.o hello.e
+	rm -f $(OBJS) $(TARGET)
