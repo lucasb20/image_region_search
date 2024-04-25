@@ -4,7 +4,7 @@ LDFLAGS = -lm
 
 SRCS = main.c pgm.c funcs.c
 OBJS = $(SRCS:.c=.o)
-TARGET = hello
+TARGET = hello.out
 
 .PHONY: all clean DEBUG_MODE
 
