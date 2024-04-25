@@ -6,7 +6,7 @@ SRCS = main.c pgm.c funcs.c
 OBJS = $(SRCS:.c=.o)
 TARGET = hello.out
 
-.PHONY: all clean DEBUG_MODE
+.PHONY: all clean debug
 
 all: $(TARGET)
 
@@ -16,8 +16,8 @@ $(TARGET): $(OBJS)
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-DEBUG_MODE: CFLAGS += -g
-DEBUG_MODE: all
+debug: CFLAGS += -g
+debug: all
 
 clean:
 	rm -f $(OBJS) $(TARGET)
