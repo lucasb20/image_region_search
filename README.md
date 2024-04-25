@@ -1,14 +1,16 @@
-# Projeto: Busca de Regiões em Imagens
+# Image Region Search
 
-Projeto iniciando como trabalho final da cadeira de Laboratório de Programação, pelo professor Daniel Ferreira no curso de Ciências da Computação.
+## Visão Geral
 
-Inclui dois algoritmos principais. O alg1 salva n subimagens borradas (que chamei várias vazes de recortes), de tamanho width x height, em um diretório a partir de uma imagem. O alg2 recebe uma imagem e um diretório com subimagens, e salva em um arquivo o nome de cada subimagem ao lado da localização de onde ela foi identificada na imagem, especificamente a coordenada da imagem que equivale do que equivale pixel superior esquerdo da subimagem, calculado por correlação cruzada.
+Projeto que foi iniciado como trabalho final da disciplina de Laboratório de Programação, lecionada pelo professor Daniel Ferreira.
 
-# Arquivos principais do projeto
+O projeto inclui dois algoritmos principais: O alg1 salva subimagens filtradas a partir de uma imagem. O alg2 realiza o processo inverso do algoritmo anterior, ele localiza na imagem a posição de uma subimagem filtrada, por meio do algoritmo de correlação cruzada.
 
-  Obs: Todos os códigos foram reduzidos para serem explicados aqui, para ver completo basta acessar os seus respectivos arquivos .c.
+## Arquivos principais do projeto
 
-### Main
+Obs: Todos os códigos foram reduzidos para resumir melhor.
+
+## Main
 
   Pega informações dadas em linha de execução e realiza uma das duas operações que o programa promete fazer, exercutar o algoritmo 1 ou o algoritmo 2.
 
@@ -37,7 +39,7 @@ Inclui dois algoritmos principais. O alg1 salva n subimagens borradas (que chame
     }
   ```
 
-### PGM
+## PGM
 
   Funções para trabalhar com arquivos .pgm.
   
@@ -124,7 +126,7 @@ void viewPGMImage(struct Image *img) {
 }
 ```
 
-### FUNÇÕES
+## FUNÇÕES
 
   Funções principais.
 
