@@ -2,11 +2,11 @@
 #define PGM_H
 
 struct Image {
-    int tipo;
+    char type;
     int width;
     int height;
-    int maxval;
-    unsigned char **Data;
+    unsigned char maxval;
+    unsigned char *Data;
 };
 
 void readPGMImage(struct Image *, char *);

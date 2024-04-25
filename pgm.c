@@ -17,13 +17,11 @@ void readPGMImage(struct Image *img, char *filename) {
         exit(2);
     }
 
-    img->tipo = getc(fp) - 48;
-
-    #ifdef __linux__
-    fseek(fp,1, SEEK_CUR);
-    #elif _WIN32
-    fseek(fp,0, SEEK_CUR);
-    #endif
+    img->type = getc(fp);
+    if (img->type != '2' && img->type != '5') {
+        puts("Formato de imagem PGM não suportado.");
+        exit(2);
+    }
 
     while ((ch = getc(fp)) == '#') {
         while ((ch = getc(fp)) != '\n');
@@ -36,35 +34,29 @@ void readPGMImage(struct Image *img, char *filename) {
         perror(NULL);
         exit(3);
     }
-    fscanf(fp, "%d", &img->maxval);
+    fscanf(fp, "%hhu", &img->maxval);
     fseek(fp, 1, SEEK_CUR);
 
-    img->Data = (unsigned char **)malloc(img->height * sizeof(unsigned char *));
-    for (int i = 0; i < img->height; i++) {
-        img->Data[i] = (unsigned char *)malloc(img->width * sizeof(unsigned char));
+    img->Data = (unsigned char *)malloc(img->width * img->height * sizeof(unsigned char));
+    if (img->Data == NULL) {
+        perror("Erro ao alocar memória.");
+        exit(4);
     }
 
-    switch (img->tipo) {
-        case 2:
+    switch (img->type) {
+        case '2':
             puts("Lendo imagem PGM (dados em texto)");
-            for (int i = 0; i < img->height; i++) {
-                for (int j = 0; j < img->width; j++) {
-                    fscanf(fp, "%hhu", &img->Data[i][j]);
-                }
+            for (int i = 0; i < img->width * img->height; i++) {
+                fscanf(fp, "%hhu", &img->Data[i]);
             }
             break;
-        case 5:
+        case '5':
             puts("Lendo imagem PGM (dados em binário)");
-            for (int i = 0; i < img->height; i++) {
-                fread(img->Data[i], sizeof(unsigned char), img->width, fp);
-            }
+            fread(img->Data, sizeof(unsigned char), img->width * img->height, fp);
             break;
-        default:
-            puts("Não está implementado");
     }
 
     fclose(fp);
-
 }
 
 void writePGMImage(struct Image *img, char *filename) {
@@ -77,24 +69,21 @@ void writePGMImage(struct Image *img, char *filename) {
 
     fprintf(fp, "%s\n", "P5");
     fprintf(fp, "%d %d\n", img->width, img->height);
-    fprintf(fp, "%d\n", 255);
+    fprintf(fp, "%hhu\n", img->maxval);
 
-    for (int i = 0; i < img->height; i++) {
-        fwrite(img->Data[i], sizeof(unsigned char), img->width, fp);
-    }
+    fwrite(img->Data, sizeof(unsigned char), img->width * img->height, fp);
 
     fclose(fp);
-
 }
 
 void viewPGMImage(struct Image *img) {
-    printf("Tipo: %d\n", img->tipo);
+    printf("Tipo: P%c\n", img->type);
     printf("Dimensões: [%d %d]\n", img->width, img->height);
-    printf("Max: %d\n", img->maxval);
+    printf("Max: %hhu\n", img->maxval);
 
     for (int i = 0; i < img->height; i++) {
         for (int j = 0; j < img->width; j++) {
-            printf("%3d ", img->Data[i][j]);
+            printf("%3d ", img->Data[i * img->width + j]);
         }
         printf("\n");
     }
