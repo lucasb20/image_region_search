@@ -5,5 +5,5 @@ struct Image filtro(struct Image);
 unsigned char media(struct Image,int, int);
 void alg1(char *, char *,int,int,int);
 void alg2(char*,char*);
-double correlacao_cruzada(unsigned char **, double **, int, int, int, int, int, int);
+double correlacao_cruzada(unsigned char *, double *, int, int, int, int, int, int);
 double media_data(struct Image);

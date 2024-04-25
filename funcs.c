@@ -61,8 +61,6 @@ void alg2(char *imagem, char *diretorio){
 
     double maior_corr = -INFINITY;
 
-    char first_rec = 1;
-
     DIR *d;
     struct dirent *dir;
 
@@ -181,38 +179,38 @@ unsigned char media(struct Image obj, int x, int y){
     return m;
 }
 
-double correlacao_cruzada(unsigned char **src, double **rec, int src_height, int src_width, int rec_height, int rec_width, int i, int j) {
-    double soma = 0.0;
-    double media_src = 0.0;
-    double media_rec = 0.0;
-    double desvio_padrao_src = 0.0;
-    double desvio_padrao_rec = 0.0;
+double correlacao_cruzada(unsigned char *src, double *sub, int src_height, int src_width, int sub_height, int sub_width, int i, int j) {
+    double sum = 0;
+    double src_mean = 0;
+    double sub_mean = 0;
+    double src_sd = 0;
+    double sub_sd = 0;
 
-    for (int a = 0; a < rec_height; a++) {
-        for (int b = 0; b < rec_width; b++) {
-            media_src += src[i+a][j+b];
-            media_rec += rec[a][b];
+    for (int a = 0; a < sub_height; a++) {
+        for (int b = 0; b < sub_width; b++) {
+            src_mean += src[(i+a)*sub_width + (j+b)];
+            sub_mean += sub[a*sub_width + b];
         }
     }
-    media_src /= (src_height * src_width);
-    media_rec /= (rec_height * rec_width);
+    src_mean /= (src_height * src_width);
+    sub_mean /= (sub_height * sub_width);
 
-    for (int a = 0; a < rec_height; a++) {
-        for (int b = 0; b < rec_width; b++) {
-            desvio_padrao_src += pow(src[i+a][j+b] - media_src, 2);
-            desvio_padrao_rec += pow(rec[a][b] - media_rec, 2);
+    for (int a = 0; a < sub_height; a++) {
+        for (int b = 0; b < sub_width; b++) {
+            src_sd += pow(src[(i+a)*sub_width + (j+b)] - src_mean, 2);
+            sub_sd += pow(sub[a*sub_width + b] - sub_mean, 2);
         }
     }
-    desvio_padrao_src = sqrt(desvio_padrao_src / (src_height * src_width));
-    desvio_padrao_rec = sqrt(desvio_padrao_rec / (rec_height * rec_width));
+    src_sd = sqrt(src_sd / (src_height * src_width));
+    sub_sd = sqrt(sub_sd / (sub_height * sub_width));
 
-    for (int a = 0; a < rec_height; a++) {
-        for (int b = 0; b < rec_width; b++) {
-            soma += ((src[i+a][j+b] - media_src) / desvio_padrao_src) * ((rec[a][b] - media_rec) / desvio_padrao_rec);
+    for (int a = 0; a < sub_height; a++) {
+        for (int b = 0; b < sub_width; b++) {
+            sum += ((src[(i+a)*sub_width + (j+b)] - src_mean) / src_sd) * ((sub[a*sub_width + b] - sub_mean) / sub_sd);
         }
     }
 
-    return soma;
+    return sum;
 }
 
 double media_data(struct Image obj){
