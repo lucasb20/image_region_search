@@ -163,8 +163,8 @@ struct Image filtro(struct Image obj){
     return img;
 }
 
-unsigned char media(struct Image obj, int x, int y){
-    unsigned char m = 0;
+int media(struct Image obj, int x, int y){
+    int m = 0;
 
     for (int i = -1; i <= 1; i++)
     {
