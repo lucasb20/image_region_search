@@ -8,7 +8,7 @@
 
 
 void alg1(char *img_name, char *dir, int n, int width, int height){
-    int i = 0,j = 0;
+    int i = 0, j = 0;
     
     struct Image *img = malloc(sizeof(struct Image));
     readPGMImage(img, img_name);
@@ -17,16 +17,16 @@ void alg1(char *img_name, char *dir, int n, int width, int height){
     struct Image *sub_images = calloc(n, sizeof(struct Image));
     
     for(int k = 0; k < n; k++){
-        i = rand()%(img_filt.height - height);
-        j = rand()%(img_filt.width - width);
+        i = rand()%(img_filt.height - height + 1);
+        j = rand()%(img_filt.width - width + 1);
 
         #ifdef DEBUG
         printf("%s, %d, %d\n", img_name, i, j);
         #endif
 
         sub_images[k].type = img->type;
-        sub_images[k].width = img->width;
-        sub_images[k].height = img->height;
+        sub_images[k].width = width;
+        sub_images[k].height = height;
         sub_images[k].maxval = img->maxval;
 
         if (!(sub_images[k].Data = (unsigned char *) calloc(width * height, sizeof(unsigned char))))
@@ -47,7 +47,7 @@ void alg1(char *img_name, char *dir, int n, int width, int height){
 
 void alg2(char *imagem, char *diretorio){
     struct Image src;
-    readPGMImage(&src,imagem);
+    readPGMImage(&src, imagem);
 
     struct Image sub_image;
 
@@ -142,21 +142,21 @@ struct Image filtro(struct Image obj){
     }
 
     aux.height = obj.height + 2;
-    aux.width = obj.height + 2;
+    aux.width = obj.width + 2;
     if (!(aux.Data = (unsigned char *) calloc(aux.width * aux.height, sizeof(unsigned char)))){
         printf("Falta de memória.\n");
         exit(1);
     }
 
-    for(int i=0; i < img.height; i++){
-        for(int j=0; j < img.width; j++){
-            aux.Data[(i+1) * aux.width + (j+1)] = img.Data[i * aux.width + j];
+    for(int i = 0; i < img.height; i++){
+        for(int j = 0; j < img.width; j++){
+            aux.Data[(i+1) * aux.width + (j+1)] = img.Data[i * img.width + j];
         }
     }
 
-    for(int i=0; i < img.height; i++){
-        for(int j=0; j < img.width; j++){
-            img.Data[i*img.width + j] = media(aux,i+1,j+1);
+    for(int i = 0; i < img.height; i++){
+        for(int j = 0; j < img.width; j++){
+            img.Data[i*img.width + j] = media(aux, i+1, j+1);
         }
     }
 

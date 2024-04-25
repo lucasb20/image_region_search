@@ -23,6 +23,8 @@ void readPGMImage(struct Image *img, char *filename) {
         exit(2);
     }
 
+    fseek(fp, 1, SEEK_CUR);
+
     while ((ch = getc(fp)) == '#') {
         while ((ch = getc(fp)) != '\n');
     }
