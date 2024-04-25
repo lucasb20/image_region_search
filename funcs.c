@@ -140,10 +140,10 @@ void alg2(char *imagem, char *diretorio){
 }
 
 void copy_data(struct Image *src, int x, int y, struct Image *des){
-    int a = x,b = y;
-    for(int i = 0; i < des->height; i++){
-        for(int j = 0; j < des->width; j++){
-            des->Data[i][j] = src->Data[a][b];
+    int a = x, b = y;
+    for (int i = 0; i < des->height; i++) {
+        for (int j = 0; j < des->width; j++) {
+            des->Data[i * des->width + j] = src->Data[a * src->width + b];
             b++;
         }
         b=y;
@@ -151,61 +151,56 @@ void copy_data(struct Image *src, int x, int y, struct Image *des){
     }
 }
 
-struct Image filtro(struct Image o){
-    struct Image img,aux;
+struct Image filtro(struct Image obj){
+    struct Image img, aux;
 
-    img.tipo = o.tipo;
-    img.height = o.height;
-    img.width = o.width;
-    img.maxval = o.maxval;
-    if(!(img.Data = (unsigned char **)calloc(img.height,sizeof(unsigned char*)))){
-            printf("Faltou memória.");
-            exit(1);
-    }
-    for(int i = 0; i<img.height; i++){
-        if(!(img.Data[i] = (unsigned char *)calloc(img.width,sizeof(unsigned char)))){
-            printf("Faltou memória.");
-            exit(1);
-        }
-    }
-    for(int i=0;i<img.height;i++){
-        for(int j=0;j<img.width;j++){
-            img.Data[i][j] = o.Data[i][j];
-        }
+    img.type = obj.type;
+    img.height = obj.height;
+    img.width = obj.width;
+    img.maxval = obj.maxval;
+    if (!(img.Data = (unsigned char *) calloc(img.width * img.height, sizeof(unsigned char)))){
+        printf("Faltou memória.");
+        exit(1);
     }
 
-    aux.height = o.height + 2;
-    aux.width = o.height + 2;
-    if(!(aux.Data = (unsigned char **)calloc(aux.height,sizeof(unsigned char*)))){
-            printf("Faltou memória.");
-            exit(1);
+    for(int i = 0; i < img.height * img.width; i++){
+        img.Data[i] = obj.Data[i];
     }
-    for(int i = 0; i<aux.height; i++){
-        if(!(aux.Data[i] = (unsigned char *)calloc(aux.width,sizeof(unsigned char)))){
-            printf("Faltou memória.");
-            exit(1);
+
+    aux.height = obj.height + 2;
+    aux.width = obj.height + 2;
+    if (!(aux.Data = (unsigned char *) calloc(aux.width * aux.height, sizeof(unsigned char)))){
+        printf("Faltou memória.");
+        exit(1);
+    }
+
+    for(int i=0; i < img.height; i++){
+        for(int j=0; j < img.width; j++){
+            aux.Data[(i+1) * aux.width + (j+1)] = img.Data[i * aux.width + j];
         }
     }
 
-    for(int i=0;i<img.height;i++){
-        for(int j=0;j<img.width;j++){
-            aux.Data[i+1][j+1] = img.Data[i][j];
-        }
-    }
-
-    for(int i=0;i<img.height;i++){
-        for(int j=0;j<img.width;j++){
-            img.Data[i][j] = media(aux,i+1,j+1);
+    for(int i=0; i < img.height; i++){
+        for(int j=0; j < img.width; j++){
+            img.Data[i*img.width + j] = media(aux,i+1,j+1);
         }
     }
 
     return img;
 }
 
-unsigned char media(struct Image o,int x, int y){
-    unsigned char m;
+unsigned char media(struct Image obj, int x, int y){
+    unsigned char m = 0;
 
-    m = (o.Data[x][y]+o.Data[x][y+1]+o.Data[x][y-1]+o.Data[x-1][y]+o.Data[x-1][y+1]+o.Data[x-1][y-1]+o.Data[x+1][y]+o.Data[x+1][y+1]+o.Data[x+1][y-1])/9;
+    for (int i = -1; i <= 1; i++)
+    {
+        for (int j = -1; j <= 1; j++)
+        {
+            m += obj.Data[(x + i) * obj.width + (y + j)];
+        }    
+    }
+
+    m /= 9;
 
     return m;
 }
