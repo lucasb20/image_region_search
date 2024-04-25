@@ -7,44 +7,41 @@
 #include "lib/pgm.h"
 
 
-void alg1(char *imagem, char *diretorio,int n,int width,int height){
-    int k = 0;
-    int i=0,j=0;
+void alg1(char *img_name, char *dir, int n, int width, int height){
+    int i = 0,j = 0;
     
-    struct Image *o = malloc(sizeof(struct Image));
-    readPGMImage(o,imagem);
+    struct Image *img = malloc(sizeof(struct Image));
+    readPGMImage(img, img_name);
 
-    struct Image o_filt = filtro(*o);
-    struct Image *recortes = calloc(n,sizeof(struct Image));
+    struct Image img_filt = filtro(*img);
+    struct Image *sub_images = calloc(n, sizeof(struct Image));
     
-    while(k<n){
-        i = rand()%(o_filt.height-height);
-        j = rand()%(o_filt.width-width);
-        
-        recortes[k].tipo = o->tipo;
-        recortes[k].width = width;
-        recortes[k].height = height;
-        recortes[k].maxval = o_filt.maxval;
+    for(int k = 0; k < n; k++){
+        i = rand()%(img_filt.height - height);
+        j = rand()%(img_filt.width - width);
 
-        if(!(recortes[k].Data = (unsigned char **)calloc(recortes[k].height,sizeof(unsigned char*)))){
+        #ifdef DEBUG
+        printf("%s, %d, %d\n", img_name, i, j);
+        #endif
+
+        sub_images[k].type = img->type;
+        sub_images[k].width = img->width;
+        sub_images[k].height = img->height;
+        sub_images[k].maxval = img->maxval;
+
+        if (!(sub_images[k].Data = (unsigned char *) calloc(width * height, sizeof(unsigned char))))
+        {
             printf("Faltou memória.");
             exit(1);
         }
-        for(int z = 0; z<recortes[k].height; z++){
-            if(!(recortes[k].Data[z] = (unsigned char *)calloc(recortes[k].width,sizeof(unsigned char)))){
-                printf("Faltou memória.");
-                exit(1);      
-            }
-        }
 
-        copy_data(&o_filt,i,j,&recortes[k]);
-        k++;
+        copy_data(&img_filt, i, j, &sub_images[k]);
     }
 
-    for(int z=0;z<n;z++){
-        char nome[100];
-        sprintf(nome,"%s/subimagem%d.pgm",diretorio,z);
-        writePGMImage(recortes+z,nome);
+    for(int k = 0; k < n; k++){
+        char name[100];
+        sprintf(name, "%s/subimage%d.pgm", dir, k);
+        writePGMImage(sub_images+k, name);
     }
 }
 
@@ -142,11 +139,11 @@ void alg2(char *imagem, char *diretorio){
     free(v);
 }
 
-void copy_data(struct Image *src,int x,int y, struct Image *des){
-    int a=x,b=y;
-    for(int i=0;i<des->height;i++){
-        for(int j=0;j<des->width;j++){
-            des->Data[i][j]=src->Data[a][b];
+void copy_data(struct Image *src, int x, int y, struct Image *des){
+    int a = x,b = y;
+    for(int i = 0; i < des->height; i++){
+        for(int j = 0; j < des->width; j++){
+            des->Data[i][j] = src->Data[a][b];
             b++;
         }
         b=y;
