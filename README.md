@@ -18,35 +18,32 @@ Funções para operar com arquivos de extensão pgm.
 
 ```c
 void readPGMImage(struct Image *img, char *filename) {
-    img->tipo = getc(fp) - 48;
+    img->type = getc(fp);
 
     while ((ch = getc(fp)) == '#') {
         while ((ch = getc(fp)) != '\n');
     }
 
-    fseek(fp, -1, SEEK_CUR);
-
     fscanf(fp, "%d %d", &img->width, &img->height);
-    fscanf(fp, "%d", &img->maxval);
-    fseek(fp, 1, SEEK_CUR);
+    fscanf(fp, "%hhu", &img->maxval);
 
-    switch (img->tipo) {
-        case 2:
+    img->Data = (unsigned char *)malloc(img->width * img->height * sizeof(unsigned char));
+    if (img->Data == NULL) {
+        perror("Erro ao alocar memória.");
+        exit(4);
+    }
+
+    switch (img->type) {
+        case '2':
             puts("Lendo imagem PGM (dados em texto)");
-            for (int i = 0; i < img->height; i++) {
-                for (int j = 0; j < img->width; j++) {
-                    fscanf(fp, "%hhu", &img->Data[i][j]);
-                }
+            for (int i = 0; i < img->width * img->height; i++) {
+                fscanf(fp, "%hhu", &img->Data[i]);
             }
             break;
-        case 5:
+        case '5':
             puts("Lendo imagem PGM (dados em binário)");
-            for (int i = 0; i < img->height; i++) {
-                fread(img->Data[i], sizeof(unsigned char), img->width, fp);
-            }
+            fread(img->Data, sizeof(unsigned char), img->width * img->height, fp);
             break;
-        default:
-            puts("Não está implementado");
     }
 }
 ```
@@ -57,11 +54,9 @@ void readPGMImage(struct Image *img, char *filename) {
 void writePGMImage(struct Image *img, char *filename) {
     fprintf(fp, "%s\n", "P5");
     fprintf(fp, "%d %d\n", img->width, img->height);
-    fprintf(fp, "%d\n", 255);
+    fprintf(fp, "%hhu\n", img->maxval);
 
-    for (int i = 0; i < img->height; i++) {
-        fwrite(img->Data[i], sizeof(unsigned char), img->width, fp);
-    }
+    fwrite(img->Data, sizeof(unsigned char), img->width * img->height, fp);
 }
 ```
 
@@ -69,13 +64,13 @@ void writePGMImage(struct Image *img, char *filename) {
 
 ```c
 void viewPGMImage(struct Image *img) {
-    printf("Tipo: %d\n", img->tipo);
+    printf("Tipo: P%c\n", img->type);
     printf("Dimensões: [%d %d]\n", img->width, img->height);
-    printf("Max: %d\n", img->maxval);
+    printf("Max: %hhu\n", img->maxval);
 
     for (int i = 0; i < img->height; i++) {
         for (int j = 0; j < img->width; j++) {
-            printf("%3d ", img->Data[i][j]);
+            printf("%3d ", img->Data[i * img->width + j]);
         }
         printf("\n");
     }
@@ -89,20 +84,19 @@ Funções principais.
 - alg1: Recebe uma imagem e armazena subimagens filtradas em um diretório a partir de posições aleatórias da imagem.
 
 ```c
-void alg1(char *imagem, char *diretorio,int n,int width,int height){  
-    struct Image *o = malloc(sizeof(struct Image));
-    readPGMImage(o,imagem);
+void alg1(char *img_name, char *dir, int n, int width, int height){
+    struct Image *img = malloc(sizeof(struct Image));
+    readPGMImage(img, img_name);
 
-    struct Image o_filt = filtro(*o);
-    struct Image *recortes = calloc(n,sizeof(struct Image));
+    struct Image img_filt = filtro(*img);
+    struct Image *sub_images = calloc(n, sizeof(struct Image));
     
-    while(k<n){
-        i = rand()%(o_filt.height-height);
-        j = rand()%(o_filt.width-width);
-        copy_data(&o_filt,i,j,&recortes[k]);
-        k++;
+    for(int k = 0; k < n; k++){
+        i = rand()%(img_filt.height - height + 1);
+        j = rand()%(img_filt.width - width + 1);
+        copy_data(&img_filt, i, j, &sub_images[k]);
     }
-  }
+}
 ```
 
 - alg2: Recebe um diretório de subimagens e identifica a localização de cada subimagem na imagem.
@@ -110,37 +104,28 @@ void alg1(char *imagem, char *diretorio,int n,int width,int height){
 ```c
 void alg2(char *imagem, char *diretorio){
     struct Image src;
-    readPGMImage(&src,imagem);
+    readPGMImage(&src, imagem);
 
-    FILE *file_ptr = fopen("alg2.txt","w");
+    while ((dir = readdir(d)) != NULL){
+        char name[400];
+        sprintf(name,"%s/%s", diretorio, dir->d_name);
+        readPGMImage(&sub_image, name);
 
-    if(d)
-    {
-        while ((dir = readdir(d)) != NULL)
-        {
-            char nome[400];
-            sprintf(nome,"%s/%s",diretorio,dir->d_name);
-            readPGMImage(&rec,nome);
+        double sub_image_mean = media_data(sub_image);
+        for(int i = 0; i < sub_image.height * sub_image.width; i++){
+            v[i] = sub_image.Data[i] / sub_image_mean;
+        }
 
-            double media_rec = media_data(rec);
-            for (int a = 0; a < rec.height; a++) {
-                for (int b = 0; b < rec.width; b++) {
-                    v[a][b] = (double)rec.Data[a][b] / media_rec;
+        for (int i = 0; i < src.height - sub_image.height + 1; i++) {
+            for (int j = 0; j < src.width - sub_image.width + 1; j++) {
+                double corr = correlacao_cruzada(src.Data, v, src.height, src.width, sub_image.height, sub_image.width, i, j);
+                if (corr > maior_corr) {
+                    maior_corr = corr;
+                    p[0] = i;
+                    p[1] = j;
                 }
             }
-
-            for (int i = 0; i < src.height - rec.height + 1; i++) {
-                for (int j = 0; j < src.width - rec.width + 1; j++) {
-                    double corr = correlacao_cruzada(src.Data, v, src.height, src.width, rec.height, rec.width, i, j);
-                    if (corr > maior_corr) {
-                        maior_corr = corr;
-                        p[0] = i;
-                        p[1] = j;
-                    }
-                }
-            }
-            fprintf(file_ptr,"%s, %d, %d\n",dir->d_name,p[0],p[1]);
         }
     }
 }
-  ```
+```
