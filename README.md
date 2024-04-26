@@ -30,6 +30,22 @@ Para utilizar o projeto, siga estas etapas:
 2. Execute o arquivo gerado para testar as funcionalidades implementadas.
 3. Siga as instruções apresentadas no console para interagir com o projeto.
 
+## Precisão
+
+A quinta imagem da pasta outros (img04_ORIGINAL.pgm) foi utilizada no alg1.
+
+Essas foram as posições adquiridas:
+
+![subimagens](outros/input.png)
+
+Esses foram os resultados do alg2 para essas subimagens:
+
+![results](outros/results.png)
+
+Lembrando que as posições dos resultados são inseridas em ordem aleatória.
+
+Precisão calculada: 
+
 ## Contribuindo
 
 Contribuições são bem-vindas! Sinta-se à vontade para abrir uma issue ou enviar um pull request com melhorias ou novas funcionalidades.

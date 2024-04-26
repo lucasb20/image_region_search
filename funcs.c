@@ -20,9 +20,7 @@ void alg1(char *img_name, char *dir, int n, int width, int height){
         i = rand()%(img_filt.height - height + 1);
         j = rand()%(img_filt.width - width + 1);
 
-        #ifdef DEBUG
-        printf("%s, %d, %d\n", img_name, i, j);
-        #endif
+        printf("subimage%d.pgm, %d, %d\n", k, i, j);
 
         sub_images[k].type = img_filt.type;
         sub_images[k].width = width;
