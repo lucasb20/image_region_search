@@ -53,11 +53,8 @@ void alg2(char *imagem, char *diretorio){
 
     int p[2];
 
-    double *v = calloc(sub_image.height * sub_image.width, sizeof(double));
-    if (!v){
-        printf("Falta de memória.\n");
-        exit(1);
-    }
+    double *v = NULL;
+    char first_img = 1;
 
     double maior_corr = -INFINITY;
 
@@ -82,12 +79,17 @@ void alg2(char *imagem, char *diretorio){
         if (strcmp(dir->d_name, ".") == 0 || strcmp(dir->d_name, "..") == 0) {
             continue;
         }
-        
+
         maior_corr = -INFINITY;
 
         char name[400];
         sprintf(name,"%s/%s", diretorio, dir->d_name);
         readPGMImage(&sub_image, name);
+
+        if(first_img){
+            v = calloc(sub_image.height * sub_image.width, sizeof(double));
+            first_img = 0;
+        }
 
         double sub_image_mean = media_data(sub_image);
         for(int i = 0; i < sub_image.height * sub_image.width; i++){
@@ -188,7 +190,7 @@ double correlacao_cruzada(unsigned char *src, double *sub, int src_height, int s
 
     for (int a = 0; a < sub_height; a++) {
         for (int b = 0; b < sub_width; b++) {
-            src_mean += src[(i+a)*sub_width + (j+b)];
+            src_mean += src[(i+a)*src_width + (j+b)];
             sub_mean += sub[a*sub_width + b];
         }
     }
@@ -197,7 +199,7 @@ double correlacao_cruzada(unsigned char *src, double *sub, int src_height, int s
 
     for (int a = 0; a < sub_height; a++) {
         for (int b = 0; b < sub_width; b++) {
-            src_sd += pow(src[(i+a)*sub_width + (j+b)] - src_mean, 2);
+            src_sd += pow(src[(i+a)*src_width + (j+b)] - src_mean, 2);
             sub_sd += pow(sub[a*sub_width + b] - sub_mean, 2);
         }
     }
@@ -206,7 +208,7 @@ double correlacao_cruzada(unsigned char *src, double *sub, int src_height, int s
 
     for (int a = 0; a < sub_height; a++) {
         for (int b = 0; b < sub_width; b++) {
-            sum += ((src[(i+a)*sub_width + (j+b)] - src_mean) / src_sd) * ((sub[a*sub_width + b] - sub_mean) / sub_sd);
+            sum += ((src[(i+a)*src_width + (j+b)] - src_mean) / src_sd) * ((sub[a*sub_width + b] - sub_mean) / sub_sd);
         }
     }
 
