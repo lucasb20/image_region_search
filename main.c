@@ -10,6 +10,8 @@ int main(int argc,char **argv){
         exit(1);
     }
 
+    srand(time(0));
+
     int op = atoi(*(argv+1));
     char *imagem = *(argv+2);
     char *diretory = *(argv+3);

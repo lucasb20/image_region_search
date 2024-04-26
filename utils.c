@@ -9,7 +9,7 @@ double media_data(struct Image obj){
     return media;
 }
 
-int media(struct Image obj, int x, int y){
+int kernel_mean(struct Image obj, int x, int y){
     int m = 0;
 
     for (int i = -1; i <= 1; i++)

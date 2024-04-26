@@ -24,10 +24,10 @@ void alg1(char *img_name, char *dir, int n, int width, int height){
         printf("%s, %d, %d\n", img_name, i, j);
         #endif
 
-        sub_images[k].type = img->type;
+        sub_images[k].type = img_filt.type;
         sub_images[k].width = width;
         sub_images[k].height = height;
-        sub_images[k].maxval = img->maxval;
+        sub_images[k].maxval = img_filt.maxval;
 
         if (!(sub_images[k].Data = (unsigned char *) calloc(width * height, sizeof(unsigned char))))
         {
@@ -43,6 +43,14 @@ void alg1(char *img_name, char *dir, int n, int width, int height){
         sprintf(name, "%s/subimage%d.pgm", dir, k);
         writePGMImage(sub_images+k, name);
     }
+
+    free(img);
+
+    for(int k = 0; k < n; k++){
+        free(sub_images[k].Data);
+    }
+
+    free(sub_images);
 }
 
 void alg2(char *imagem, char *diretorio){
@@ -88,6 +96,10 @@ void alg2(char *imagem, char *diretorio){
 
         if(first_img){
             v = calloc(sub_image.height * sub_image.width, sizeof(double));
+            if (!v) {
+                puts("Falta de memória.");
+                exit(1);
+            }
             first_img = 0;
         }
 
@@ -146,9 +158,11 @@ struct Image filtro(struct Image obj){
 
     for(int i = 0; i < img.height; i++){
         for(int j = 0; j < img.width; j++){
-            img.Data[i*img.width + j] = media(aux, i+1, j+1);
+            img.Data[i*img.width + j] = kernel_mean(aux, i+1, j+1);
         }
     }
+
+    free(aux.Data);
 
     return img;
 }
