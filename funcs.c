@@ -5,7 +5,7 @@
 #include <string.h>
 #include "lib/funcs.h"
 #include "lib/pgm.h"
-
+#include "lib/utils.h"
 
 void alg1(char *img_name, char *dir, int n, int width, int height){
     int i = 0, j = 0;
@@ -115,18 +115,6 @@ void alg2(char *imagem, char *diretorio){
     free(v);
 }
 
-void copy_data(struct Image *src, int x, int y, struct Image *des){
-    int a = x, b = y;
-    for (int i = 0; i < des->height; i++) {
-        for (int j = 0; j < des->width; j++) {
-            des->Data[i * des->width + j] = src->Data[a * src->width + b];
-            b++;
-        }
-        b=y;
-        a++;
-    }
-}
-
 struct Image filtro(struct Image obj){
     struct Image img, aux;
 
@@ -165,22 +153,6 @@ struct Image filtro(struct Image obj){
     return img;
 }
 
-int media(struct Image obj, int x, int y){
-    int m = 0;
-
-    for (int i = -1; i <= 1; i++)
-    {
-        for (int j = -1; j <= 1; j++)
-        {
-            m += obj.Data[(x + i) * obj.width + (y + j)];
-        }    
-    }
-
-    m /= 9;
-
-    return m;
-}
-
 double correlacao_cruzada(unsigned char *src, double *sub, int src_height, int src_width, int sub_height, int sub_width, int i, int j) {
     double sum = 0;
     double src_mean = 0;
@@ -213,13 +185,4 @@ double correlacao_cruzada(unsigned char *src, double *sub, int src_height, int s
     }
 
     return sum;
-}
-
-double media_data(struct Image obj){
-    double media = 0;
-    for(int i = 0; i < obj.height * obj.width; i++){
-        media += obj.Data[i];
-    }
-    media /= obj.height*obj.width;
-    return media;
 }
