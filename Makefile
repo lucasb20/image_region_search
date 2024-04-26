@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Wpedantic -std=c99
+CFLAGS = -Wall -Wextra -std=c99
 LDFLAGS = -lm
 
 SRCS = main.c pgm.c funcs.c
