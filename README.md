@@ -42,9 +42,9 @@ Esses foram os resultados do alg2 para essas subimagens:
 
 ![results](outros/results.png)
 
-Lembrando que as posições dos resultados são inseridas em ordem aleatória.
+Note que as posições dos resultados estão inseridas em ordem aleatória.
 
-Precisão calculada: 
+Precisão Média: **98.94%**
 
 ## Contribuindo
 
