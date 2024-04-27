@@ -62,8 +62,6 @@ void alg2(char *imagem, char *diretorio){
     double *v = NULL;
     char first_img = 1;
 
-    double maior_corr = -INFINITY;
-
     DIR *d;
     struct dirent *dir;
 
@@ -86,7 +84,7 @@ void alg2(char *imagem, char *diretorio){
             continue;
         }
 
-        maior_corr = -INFINITY;
+        double maior_corr = -INFINITY;
 
         char name[400];
         sprintf(name,"%s/%s", diretorio, dir->d_name);
@@ -114,6 +112,12 @@ void alg2(char *imagem, char *diretorio){
                     p[0] = i;
                     p[1] = j;
                 }
+                #ifdef OPTIMIZER
+                else if(maior_corr > 0)
+                {
+                    j += (maior_corr - corr)*(src.width * 0.1)/maior_corr;
+                }
+                #endif
             }
         }
         
