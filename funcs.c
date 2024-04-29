@@ -96,22 +96,11 @@ void alg2(char *imagem, char *diretorio){
 }
 
 void alg_cross_corr(struct Image src, struct Image sub, int* p){
-    double *v = NULL;
-    if (!(v = calloc(sub.height * sub.width, sizeof(double)))) {
-        puts("Falta de memória.");
-        exit(1);
-    }
-
-    double sub_mean = media_data(sub);
-    for(int i = 0; i < sub.height * sub.width; i++){
-            v[i] = sub.Data[i] / sub_mean;
-    }
-
     double maior_corr = -INFINITY;
 
     for (int i = 0; i < src.height - sub.height + 1; i++) {
             for (int j = 0; j < src.width - sub.width + 1; j++) {
-                double corr = correlacao_cruzada(src.Data, v, src.height, src.width, sub.height, sub.width, i, j);
+                double corr = correlacao_cruzada(src.Data, sub.Data, src.height, src.width, sub.height, sub.width, i, j);
                 if (corr > maior_corr) {
                     maior_corr = corr;
                     p[0] = i;
@@ -125,8 +114,6 @@ void alg_cross_corr(struct Image src, struct Image sub, int* p){
                 #endif
             }
     }
-
-    free(v);
 }
 
 struct Image filtro(struct Image obj){
@@ -169,7 +156,7 @@ struct Image filtro(struct Image obj){
     return img;
 }
 
-double correlacao_cruzada(unsigned char *src, double *sub, int src_height, int src_width, int sub_height, int sub_width, int i, int j) {
+double correlacao_cruzada(unsigned char *src, unsigned char *sub, int src_height, int src_width, int sub_height, int sub_width, int i, int j) {
     double sum = 0;
     double src_mean = 0;
     double sub_mean = 0;
