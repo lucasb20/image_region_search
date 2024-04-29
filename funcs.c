@@ -132,6 +132,13 @@ void alg_MSE(struct Image src, struct Image sub, int* p){
             p[0] = i;
             p[1] = j;
         }
+
+        #ifdef OPTIMIZER
+        else
+        {
+            j += sqrt(mse)/((float) sub.width*sub.width)*(sub.width*0.1);
+        }
+        #endif
       }
     }
 }
