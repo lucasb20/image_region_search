@@ -3,6 +3,7 @@
 #include <math.h>
 #include <dirent.h>
 #include <string.h>
+#include <limits.h>
 #include "lib/funcs.h"
 #include "lib/pgm.h"
 #include "lib/utils.h"
@@ -115,15 +116,15 @@ void alg_cross_corr(struct Image src, struct Image sub, int* p){
 }
 
 void alg_MSE(struct Image src, struct Image sub, int* p){
-    double menor_mse = INFINITY;
+    unsigned menor_mse = UINT_MAX;
 
     for (int i = 0; i < src.height - sub.height + 1; i++) {
       for (int j = 0; j < src.width - sub.width + 1; j++) {
-        double mse = 0;
+        unsigned mse = 0;
         for (int a = 0; a < sub.height; a++) {
           for (int b = 0; b < sub.width; b++) {
             int index = (i + a) * src.width + (j + b);
-            mse += pow(src.Data[index] - sub.Data[a * sub.width + b], 2);
+            mse += uPowOf2(src.Data[index] - sub.Data[a * sub.width + b]);
           }
         }
         if (mse < menor_mse) {

@@ -25,7 +25,6 @@ int kernel_mean(struct Image obj, int x, int y){
     return m;
 }
 
-
 void copy_data(struct Image *src, int x, int y, struct Image *des){
     int a = x, b = y;
     for (int i = 0; i < des->height; i++) {
@@ -36,4 +35,8 @@ void copy_data(struct Image *src, int x, int y, struct Image *des){
         b=y;
         a++;
     }
+}
+
+unsigned uPowOf2(int x){
+    return x*x;
 }
