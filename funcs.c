@@ -118,11 +118,20 @@ void alg_cross_corr(struct Image src, struct Image sub, int* p){
 void alg_MSE(struct Image src, struct Image sub, int* p){
     unsigned menor_mse = UINT_MAX;
 
+    #ifdef OPTIMIZER
+    double ratio = (1 - sub.width/((double) src.width));
+    int sub_width = sub.width * ratio;
+    int sub_height = sub.height * ratio;
+    #else
+    int sub_width = sub.width;
+    int sub_height = sub.height;
+    #endif
+
     for (int i = 0; i < src.height - sub.height + 1; i++) {
       for (int j = 0; j < src.width - sub.width + 1; j++) {
         unsigned mse = 0;
-        for (int a = 0; a < sub.height; a++) {
-          for (int b = 0; b < sub.width; b++) {
+        for (int a = 0; a < sub_height; a++) {
+          for (int b = 0; b < sub_width; b++) {
             int index = (i + a) * src.width + (j + b);
             mse += uPowOf2(src.Data[index] - sub.Data[a * sub.width + b]);
           }
@@ -136,7 +145,7 @@ void alg_MSE(struct Image src, struct Image sub, int* p){
         #ifdef OPTIMIZER
         else
         {
-            j += sqrt(mse)/((float) sub.width*sub.width)*(sub.width*0.1);
+            j += sqrt(mse)/(sub.width*sub.height)*(sub.width*0.1);
         }
         #endif
       }
