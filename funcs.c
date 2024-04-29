@@ -7,6 +7,8 @@
 #include "lib/pgm.h"
 #include "lib/utils.h"
 
+#define OPTIMIZER 1
+
 void alg1(char *img_name, char *dir, int n, int width, int height){
     int i = 0, j = 0;
     
@@ -57,13 +59,10 @@ void alg2(char *imagem, char *diretorio){
 
     struct Image sub_image;
 
-    int p[2];
-
-    double *v = NULL;
-    char first_img = 1;
-
     DIR *d;
     struct dirent *dir;
+
+    int p[2] = {0};
 
     d = opendir(diretorio);
 
@@ -84,29 +83,35 @@ void alg2(char *imagem, char *diretorio){
             continue;
         }
 
-        double maior_corr = -INFINITY;
-
         char name[400];
         sprintf(name,"%s/%s", diretorio, dir->d_name);
         readPGMImage(&sub_image, name);
 
-        if(first_img){
-            v = calloc(sub_image.height * sub_image.width, sizeof(double));
-            if (!v) {
-                puts("Falta de memória.");
-                exit(1);
-            }
-            first_img = 0;
-        }
+        alg_cross_corr(src, sub_image, p);
+        
+        fprintf(file_ptr, "%s, %d, %d\n", dir->d_name, p[0], p[1]);
+    }
+    fclose(file_ptr);
+    closedir(d);
+}
 
-        double sub_image_mean = media_data(sub_image);
-        for(int i = 0; i < sub_image.height * sub_image.width; i++){
-            v[i] = sub_image.Data[i] / sub_image_mean;
-        }
+void alg_cross_corr(struct Image src, struct Image sub, int* p){
+    double *v = NULL;
+    if (!(v = calloc(sub.height * sub.width, sizeof(double)))) {
+        puts("Falta de memória.");
+        exit(1);
+    }
 
-        for (int i = 0; i < src.height - sub_image.height + 1; i++) {
-            for (int j = 0; j < src.width - sub_image.width + 1; j++) {
-                double corr = correlacao_cruzada(src.Data, v, src.height, src.width, sub_image.height, sub_image.width, i, j);
+    double sub_mean = media_data(sub);
+    for(int i = 0; i < sub.height * sub.width; i++){
+            v[i] = sub.Data[i] / sub_mean;
+    }
+
+    double maior_corr = -INFINITY;
+
+    for (int i = 0; i < src.height - sub.height + 1; i++) {
+            for (int j = 0; j < src.width - sub.width + 1; j++) {
+                double corr = correlacao_cruzada(src.Data, v, src.height, src.width, sub.height, sub.width, i, j);
                 if (corr > maior_corr) {
                     maior_corr = corr;
                     p[0] = i;
@@ -119,13 +124,8 @@ void alg2(char *imagem, char *diretorio){
                 }
                 #endif
             }
-        }
-        
-        fprintf(file_ptr, "%s, %d, %d\n", dir->d_name, p[0], p[1]);
     }
-    fclose(file_ptr);
-    closedir(d);
-    
+
     free(v);
 }
 
