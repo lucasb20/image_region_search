@@ -7,8 +7,6 @@
 #include "lib/pgm.h"
 #include "lib/utils.h"
 
-#define OPTIMIZER 1
-
 void alg1(char *img_name, char *dir, int n, int width, int height){
     int i = 0, j = 0;
     
@@ -87,7 +85,7 @@ void alg2(char *imagem, char *diretorio){
         sprintf(name,"%s/%s", diretorio, dir->d_name);
         readPGMImage(&sub_image, name);
 
-        alg_cross_corr(src, sub_image, p);
+        alg_MSE(src, sub_image, p);
         
         fprintf(file_ptr, "%s, %d, %d\n", dir->d_name, p[0], p[1]);
     }
@@ -113,6 +111,27 @@ void alg_cross_corr(struct Image src, struct Image sub, int* p){
                 }
                 #endif
             }
+    }
+}
+
+void alg_MSE(struct Image src, struct Image sub, int* p){
+    double menor_mse = INFINITY;
+
+    for (int i = 0; i < src.height - sub.height + 1; i++) {
+      for (int j = 0; j < src.width - sub.width + 1; j++) {
+        double mse = 0;
+        for (int a = 0; a < sub.height; a++) {
+          for (int b = 0; b < sub.width; b++) {
+            int index = (i + a) * src.width + (j + b);
+            mse += pow(src.Data[index] - sub.Data[a * sub.width + b], 2);
+          }
+        }
+        if (mse < menor_mse) {
+            menor_mse = mse;
+            p[0] = i;
+            p[1] = j;
+        }
+      }
     }
 }
 
