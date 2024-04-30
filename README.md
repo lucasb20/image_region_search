@@ -38,7 +38,7 @@ Para os algoritmos de comparação, a quinta imagem da pasta 'outros' (img04_ORI
 
 Obs: Quanto maior a área da subimagem, mais fácil é para comparar, logo melhor é a precisão. Quanto maior a quantidade de subimagens, maior é o tempo total de execução.
 
-1. **alg2 ( MSE - Erro Médio Quadrático)**
+1. **alg2 ( MSE - Erro Médio Quadrático )**
 
 100 subimagens 50x50
 
@@ -57,6 +57,16 @@ Acurácia (sem tolerância): **70%**
 Precisão Média: **99.8%**
 
 Tempo Total: **67 min**
+
+3. **alg2 ( MAE - Erro Médio Absoluto )**
+
+100 subimagens 50x50
+
+Acurácia (sem tolerância): **100%**
+
+Precisão Média: **100%**
+
+Tempo Total: **12 min**
 
 ## Contribuindo
 
