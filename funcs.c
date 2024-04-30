@@ -86,12 +86,33 @@ void alg2(char *imagem, char *diretorio){
         sprintf(name,"%s/%s", diretorio, dir->d_name);
         readPGMImage(&sub_image, name);
 
-        alg_MSE(src, sub_image, p);
+        alg_MAE(src, sub_image, p);
         
         fprintf(file_ptr, "%s, %d, %d\n", dir->d_name, p[0], p[1]);
     }
     fclose(file_ptr);
     closedir(d);
+}
+
+void alg_MAE(struct Image src, struct Image sub, int* p){
+    unsigned menor_MAE = UINT_MAX;
+
+    for (int i = 0; i < src.height - sub.height + 1; i++) {
+      for (int j = 0; j < src.width - sub.width + 1; j++) {
+        unsigned mae = 0;
+        for (int a = 0; a < sub.height; a++) {
+          for (int b = 0; b < sub.width; b++) {
+            int index = (i + a) * src.width + (j + b);
+            mae += abs(src.Data[index] - sub.Data[a * sub.width + b]);
+          }
+        }
+        if (mae < menor_MAE) {
+            menor_MAE = mae;
+            p[0] = i;
+            p[1] = j;
+        }
+      }
+    }
 }
 
 void alg_cross_corr(struct Image src, struct Image sub, int* p){

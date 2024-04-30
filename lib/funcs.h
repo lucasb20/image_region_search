@@ -6,3 +6,4 @@ struct Image filtro(struct Image);
 double correlacao_cruzada(unsigned char *, unsigned char *, int, int, int, int, int, int);
 void alg_cross_corr(struct Image,struct Image,int*);
 void alg_MSE(struct Image,struct Image,int*);
+void alg_MAE(struct Image,struct Image,int*);
