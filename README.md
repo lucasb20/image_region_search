@@ -32,41 +32,32 @@ Para utilizar o projeto, siga estas etapas:
 
 ## Eficiência dos Algoritmos
 
-Não há o que medir no alg1, porque, para quaisquer medidas ou quantidades, demora menos de um segundo para realizar esse simples processo.
+O alg1 é tão eficiente que não necessita de medição, pois para qualquer quantidade de dados, executa o processo em menos de um segundo.
 
-Para os algoritmos de comparação, a quinta imagem da pasta 'outros' (img04_ORIGINAL.pgm) foi utilizada no alg1 para gerar as subimagens.
+Para avaliar os algoritmos de comparação, utilizei a quinta imagem da pasta 'outros' (img04_ORIGINAL.pgm) com o alg1 para gerar as subimagens.
 
-Obs: Quanto maior a área da subimagem, mais fácil é para comparar, logo melhor é a precisão. Quanto maior a quantidade de subimagens, maior é o tempo total de execução.
+Obs: Quanto maior a área da subimagem, mais fácil é para a comparação, resultando em maior precisão. O tempo total de execução aumenta à medida que a quantidade de subimagens aumenta.
 
-1. **alg2 ( MSE - Erro Médio Quadrático )**
+1. **alg2 (MSE - Erro Médio Quadrático)**
 
-100 subimagens 50x50
+- 100 subimagens de tamanho 50x50
+- Acurácia (sem tolerância): **100%**
+- Precisão Média: **100%**
+- Tempo Total: **15 min**
 
-Acurácia (sem tolerância): **100%**
+2. **alg2 (cross-corr - Correlação Cruzada)**
 
-Precisão Média: **100%**
+- 10 subimagens de tamanho 100x100
+- Acurácia (sem tolerância): **70%**
+- Precisão Média: **99.8%**
+- Tempo Total: **67 min**
 
-Tempo Total: **15 min**
+3. **alg2 (MAE - Erro Médio Absoluto)**
 
-2. **alg2 ( cross-corr - Correlação Cruzada )**
-
-10 subimagens 100x100
-
-Acurácia (sem tolerância): **70%**
-
-Precisão Média: **99.8%**
-
-Tempo Total: **67 min**
-
-3. **alg2 ( MAE - Erro Médio Absoluto )**
-
-100 subimagens 50x50
-
-Acurácia (sem tolerância): **100%**
-
-Precisão Média: **100%**
-
-Tempo Total: **12 min**
+- 100 subimagens de tamanho 50x50
+- Acurácia (sem tolerância): **100%**
+- Precisão Média: **100%**
+- Tempo Total: **12 min**
 
 ## Contribuindo
 
