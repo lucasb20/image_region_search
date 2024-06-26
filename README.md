@@ -38,21 +38,21 @@ Para avaliar os algoritmos de comparação, utilizei a quinta imagem da pasta 'o
 
 Obs: Quanto maior a área da subimagem, mais fácil é para a comparação, resultando em maior precisão. O tempo total de execução aumenta à medida que a quantidade de subimagens aumenta.
 
-1. **alg2 (MSE - Erro Médio Quadrático)**
+1. **MSE - Erro Médio Quadrático**
 
 - 100 subimagens de tamanho 50x50
 - Acurácia (sem tolerância): **100%**
 - Precisão Média: **100%**
 - Tempo Total: **15 min**
 
-2. **alg2 (cross-corr - Correlação Cruzada)**
+2. **cross-corr - Correlação Cruzada**
 
 - 10 subimagens de tamanho 100x100
 - Acurácia (sem tolerância): **70%**
 - Precisão Média: **99.8%**
 - Tempo Total: **67 min**
 
-3. **alg2 (MAE - Erro Médio Absoluto)**
+3. **MAE - Erro Médio Absoluto**
 
 - 100 subimagens de tamanho 50x50
 - Acurácia (sem tolerância): **100%**
