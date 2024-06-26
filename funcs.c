@@ -17,11 +17,18 @@ void alg1(char *img_name, char *dir, int n, int width, int height){
     struct Image img_filt = filtro(*img);
     struct Image *sub_images = calloc(n, sizeof(struct Image));
     
+    FILE *file_ptr = fopen("alg1.txt","w");
+
+    if(!(file_ptr)){
+        puts("Erro ao abrir criar o arquivo.");
+        exit(1);
+    }
+
     for(int k = 0; k < n; k++){
         i = rand()%(img_filt.height - height + 1);
         j = rand()%(img_filt.width - width + 1);
 
-        printf("subimage%d.pgm, %d, %d\n", k, i, j);
+        fprintf(file_ptr, "subimage%d.pgm, %d, %d\n", k, i, j);
 
         sub_images[k].type = img_filt.type;
         sub_images[k].width = width;
