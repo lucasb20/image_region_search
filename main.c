@@ -6,15 +6,15 @@
 
 int main(int argc,char **argv){
     if(argc != 4){
-        printf("Formato: %s <num_teste alg1 (1) ou alg2 (2)> <imagem> <directory>\n",*argv);
+        printf("Formato: %s <num_op alg1 (1) ou alg2 (2)> <image> <directory>\n",*argv);
         exit(1);
     }
 
     srand(time(0));
 
     int op = atoi(*(argv+1));
-    char *imagem = *(argv+2);
-    char *diretory = *(argv+3);
+    char *image = *(argv+2);
+    char *directory = *(argv+3);
 
     int n;
     int w;
@@ -31,12 +31,12 @@ int main(int argc,char **argv){
             puts("Digite uma altura.");
             scanf("%d",&h);
 
-            alg1(imagem,diretory,n,w,h);
+            alg1(image,directory,n,w,h);
             break;
 
         case 2:
             begin = clock();
-            alg2(imagem,diretory);
+            alg2(image,directory);
             end = clock();
             double tempo_total = (double)(end - begin)/CLOCKS_PER_SEC;
             printf("Tempo total: %lfs\n(%lf min)",tempo_total,tempo_total/60);
