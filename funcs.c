@@ -50,6 +50,8 @@ void alg1(char *img_name, char *dir, int n, int width, int height){
         writePGMImage(sub_images+k, name);
     }
 
+    fclose(file_ptr);
+
     free(img);
 
     for(int k = 0; k < n; k++){
